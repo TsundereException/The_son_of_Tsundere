@@ -4,9 +4,22 @@ from apps.users.serializers import UserSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'parent']
+        fields = ['id', 'name', 'slug', 'parent', 'children']
+        read_only_fields = ['slug']
+
+    def get_children(self, obj):
+        kids = obj.children.all()
+        return CategorySerializer(kids, many=True).data if kids else []
+
+    def create(self, validated_data):
+        from django.utils.text import slugify
+        import uuid
+        validated_data['slug'] = slugify(validated_data['name']) + '-' + str(uuid.uuid4())[:6]
+        return super().create(validated_data)
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
