@@ -16,9 +16,38 @@ from apps.users.permissions import IsSeller, IsOwnerOrReadOnly
 
 class CategoryListView(generics.ListAPIView):
     """GET /api/v1/products/categories/"""
-    queryset = Category.objects.filter(parent=None)
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
+
+class CategoryCreateView(generics.CreateAPIView):
+    """POST /api/v1/products/categories/create/ — тільки адмін"""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        if not self.request.user.is_staff:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Тільки адміністратор може створювати категорії')
+        serializer.save()
+
+
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """GET/PATCH/DELETE /api/v1/products/categories/<id>/"""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def check_object_permissions(self, request, obj):
+        super().check_object_permissions(request, obj)
+        if request.method in ('PATCH', 'PUT', 'DELETE') and not request.user.is_staff:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Тільки адміністратор може редагувати категорії')
 
 
 class ProductListView(generics.ListAPIView):
