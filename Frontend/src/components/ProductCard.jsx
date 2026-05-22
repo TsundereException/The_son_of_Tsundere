@@ -17,16 +17,25 @@ import { Link } from 'react-router-dom';
  * @returns {JSX.Element} React компонент картки товару.
  */
 export default function ProductCard({ product }) {
+  // Мапінг полів з бекенду або використання мок-даних як fallback
+  const title = product.name || product.title;
+  const price = product.price;
+  const imageUrl = product.main_image || product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600';
+  const location = product.location || 'Онлайн';
+  const date = product.created_at ? new Date(product.created_at).toLocaleDateString() : product.date;
+  const condition = product.condition || 'New'; // Можна витягнути з category або додати на бекенді пізніше
+  const idOrSlug = product.slug || product.id;
+
   return (
-    <Link to={`/product/${product.id}`} className="group block">
+    <Link to={`/product/${idOrSlug}`} className="group block">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200">
         <div className="aspect-w-4 aspect-h-3 bg-gray-200 relative overflow-hidden">
           <img 
-            src={product.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=600'} 
-            alt={product.title}
+            src={imageUrl} 
+            alt={title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          {product.condition === 'New' && (
+          {condition === 'New' && (
             <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-md">
               Нове
             </span>
@@ -34,19 +43,19 @@ export default function ProductCard({ product }) {
         </div>
         <div className="p-4">
           <h3 className="text-lg font-medium text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
-            {product.title}
+            {title}
           </h3>
           <p className="mt-1 text-xl font-bold text-gray-900">
-            {product.price} ₴
+            {price} ₴
           </p>
           <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-1">
               <MapPin className="w-4 h-4" />
-              <span className="truncate max-w-[100px]">{product.location}</span>
+              <span className="truncate max-w-[100px]">{location}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              <span>{product.date}</span>
+              <span>{date}</span>
             </div>
           </div>
         </div>

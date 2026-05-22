@@ -27,6 +27,7 @@ class Product(models.Model):
     name        = models.CharField(max_length=200, verbose_name='Назва')
     slug        = models.SlugField(unique=True)
     description = models.TextField(verbose_name='Опис')
+    attributes  = models.JSONField(default=dict, blank=True, verbose_name='Характеристики та атрибути')
     price       = models.DecimalField(max_digits=10, decimal_places=2,
                                       validators=[MinValueValidator(0)], verbose_name='Ціна')
     stock       = models.PositiveIntegerField(default=0, verbose_name='Кількість')
