@@ -13,10 +13,19 @@ const TABS = [
  * Компонент вкладок (табів) для сторінки деталей товару.
  * Відображає різні секції інформації про товар (Опис, Характеристики, Комплектація тощо).
  *
+ * @param {Object} props
+ * @param {string} props.description - Опис товару з бекенду
+ * @param {Object} props.attributes - Додаткові атрибути з бекенду (JSON)
  * @returns {JSX.Element} React компонент вкладок товару.
  */
-export default function ProductTabs() {
+export default function ProductTabs({ description, attributes = {} }) {
   const [activeTab, setActiveTab] = useState('description');
+
+  const chars = attributes.characteristics || {};
+  const packageItems = attributes.package || [];
+  const warranty = attributes.warranty || '';
+  const condition = attributes.condition || '';
+  const benefits = attributes.benefits || [];
 
   return (
     <div className="mt-12 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -42,63 +51,61 @@ export default function ProductTabs() {
         {activeTab === 'description' && (
           <div className="prose max-w-none text-gray-600">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Детальний опис товару</h3>
-            <p className="mb-4">
-              Це ідеальний пристрій для тих, хто цінує надійність, швидкість та стильний дизайн. 
-              Завдяки новітньому процесору ви зможете виконувати найскладніші завдання без затримок.
-            </p>
-            <p>
-              Пристрій оснащений чудовим екраном з високою роздільною здатністю, що робить перегляд фільмів та роботу з графікою справжнім задоволенням.
-            </p>
+            {description ? (
+              <p className="whitespace-pre-wrap">{description}</p>
+            ) : (
+              <p>Опис відсутній.</p>
+            )}
           </div>
         )}
 
         {activeTab === 'characteristics' && (
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Характеристики</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-500">Бренд:</span>
-                <span className="font-medium text-gray-900">Apple</span>
+            {Object.keys(chars).length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {Object.entries(chars).map(([key, val]) => (
+                  <div key={key} className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-500">{key}:</span>
+                    <span className="font-medium text-gray-900">{val}</span>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-500">Модель:</span>
-                <span className="font-medium text-gray-900">MacBook Pro M2</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-500">Пам'ять:</span>
-                <span className="font-medium text-gray-900">512 GB SSD</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-500">ОЗП:</span>
-                <span className="font-medium text-gray-900">16 GB</span>
-              </div>
-            </div>
+            ) : (
+              <p className="text-gray-500">Характеристики не вказані.</p>
+            )}
           </div>
         )}
 
         {activeTab === 'package' && (
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Комплектація</h3>
-            <ul className="list-disc list-inside space-y-2 text-gray-600">
-              <li>Оригінальна коробка</li>
-              <li>Пристрій</li>
-              <li>Зарядний кабель (Type-C)</li>
-              <li>Блок живлення 67W</li>
-              <li>Документація та наклейки</li>
-            </ul>
+            {packageItems.length > 0 ? (
+              <ul className="list-disc list-inside space-y-2 text-gray-600">
+                {packageItems.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">Інформація про комплектацію відсутня.</p>
+            )}
           </div>
         )}
 
         {activeTab === 'warranty' && (
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Гарантія</h3>
-            <div className="bg-green-50 text-green-800 p-4 rounded-lg flex items-start">
-              <svg className="w-6 h-6 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <div>
-                <p className="font-semibold">Офіційна гарантія від виробника: 12 місяців</p>
-                <p className="text-sm mt-1 text-green-700">Можливе повернення товару протягом 14 днів з моменту покупки згідно із законодавством України.</p>
+            {warranty ? (
+              <div className="bg-green-50 text-green-800 p-4 rounded-lg flex items-start">
+                <svg className="w-6 h-6 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>
+                  <p className="font-semibold">{warranty}</p>
+                  <p className="text-sm mt-1 text-green-700">Можливе повернення товару протягом 14 днів з моменту покупки згідно із законодавством України.</p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <p className="text-gray-500">Гарантія не вказана.</p>
+            )}
           </div>
         )}
 
@@ -106,10 +113,9 @@ export default function ProductTabs() {
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Стан товару</h3>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="font-medium text-gray-900 mb-2">Ідеальний (Як новий)</p>
+              <p className="font-medium text-gray-900 mb-2">{condition || 'Не вказано'}</p>
               <p className="text-gray-600 text-sm">
-                Пристрій був у користуванні менше тижня. Жодних подряпин на екрані або корпусі. 
-                Батарея має 100% ємності (всього 4 цикли перезарядки). Всі функції працюють бездоганно.
+                Деталі про стан товару можна дізнатися у продавця.
               </p>
             </div>
           </div>
@@ -118,23 +124,19 @@ export default function ProductTabs() {
         {activeTab === 'benefits' && (
           <div>
             <h3 className="text-lg font-bold text-gray-900 mb-4">Додаткові переваги</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-indigo-50 p-4 rounded-xl text-center">
-                <div className="text-2xl mb-2">🚀</div>
-                <h4 className="font-semibold text-indigo-900 text-sm mb-1">Безкоштовна доставка</h4>
-                <p className="text-xs text-indigo-700">Відправляємо Новою Поштою в день замовлення без передоплати.</p>
+            {benefits.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {benefits.map((b, idx) => (
+                  <div key={idx} className="bg-indigo-50 p-4 rounded-xl text-center">
+                    <div className="text-2xl mb-2">{b.icon || '✨'}</div>
+                    <h4 className="font-semibold text-indigo-900 text-sm mb-1">{b.title}</h4>
+                    <p className="text-xs text-indigo-700">{b.text}</p>
+                  </div>
+                ))}
               </div>
-              <div className="bg-amber-50 p-4 rounded-xl text-center">
-                <div className="text-2xl mb-2">🛡️</div>
-                <h4 className="font-semibold text-amber-900 text-sm mb-1">Безпечна угода</h4>
-                <p className="text-xs text-amber-700">Гроші резервуються на платформі доки ви не оглянете товар.</p>
-              </div>
-              <div className="bg-rose-50 p-4 rounded-xl text-center">
-                <div className="text-2xl mb-2">🎁</div>
-                <h4 className="font-semibold text-rose-900 text-sm mb-1">Подарунок</h4>
-                <p className="text-xs text-rose-700">У комплекті йде якісний чохол та захисне скло на екран.</p>
-              </div>
-            </div>
+            ) : (
+              <p className="text-gray-500">Додаткові переваги не вказані.</p>
+            )}
           </div>
         )}
       </div>

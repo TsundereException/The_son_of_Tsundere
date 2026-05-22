@@ -1,8 +1,43 @@
 import { useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
+
+  // Form states
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        await login({ email, password });
+        navigate('/'); // Redirect to home on success
+      } else {
+        if (password !== confirmPassword) {
+          throw new Error('Паролі не співпадають');
+        }
+        await register({ email, password, first_name: name });
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err.message || 'Сталася помилка при авторизації');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -23,20 +58,26 @@ export default function AuthPage() {
         {/* Tab switch */}
         <div className="flex bg-gray-100 p-1 rounded-xl relative z-10">
           <button
-            onClick={() => setIsLogin(true)}
+            onClick={() => { setIsLogin(true); setError(null); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${isLogin ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
           >
             Вхід
           </button>
           <button
-            onClick={() => setIsLogin(false)}
+            onClick={() => { setIsLogin(false); setError(null); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${!isLogin ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
           >
             Реєстрація
           </button>
         </div>
 
-        <form className="mt-8 space-y-6 relative z-10" onSubmit={(e) => e.preventDefault()}>
+        <form className="mt-8 space-y-6 relative z-10" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+              {error}
+            </div>
+          )}
+
           <div className="space-y-4">
             {!isLogin && (
               <div>
@@ -48,6 +89,8 @@ export default function AuthPage() {
                   <input
                     type="text"
                     required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     placeholder="Джон Доу"
                   />
@@ -64,6 +107,8 @@ export default function AuthPage() {
                 <input
                   type="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                   placeholder="you@example.com"
                 />
@@ -79,6 +124,8 @@ export default function AuthPage() {
                 <input
                   type="password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
@@ -95,6 +142,8 @@ export default function AuthPage() {
                   <input
                     type="password"
                     required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     placeholder="••••••••"
                   />
@@ -128,9 +177,10 @@ export default function AuthPage() {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white transition-colors ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
             >
-              {isLogin ? 'Увійти' : 'Зареєструватися'}
+              {loading ? 'Зачекайте...' : (isLogin ? 'Увійти' : 'Зареєструватися')}
             </button>
           </div>
         </form>
