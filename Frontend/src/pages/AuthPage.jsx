@@ -29,11 +29,18 @@ export default function AuthPage() {
         if (password !== confirmPassword) {
           throw new Error('Паролі не співпадають');
         }
-        await register({ email, password, first_name: name });
+        // Генеруємо username з email для бекенду (бо він вимагається Django)
+        const username = email.split('@')[0] + Math.floor(Math.random() * 10000);
+        await register({ email, username, password, password2: confirmPassword, first_name: name });
         navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Сталася помилка при авторизації');
+      if (err.response && err.response.data) {
+        const errorMessages = Object.values(err.response.data).flat().join(' ');
+        setError(errorMessages || 'Сталася помилка при авторизації');
+      } else {
+        setError(err.message || 'Сталася помилка при авторизації');
+      }
     } finally {
       setLoading(false);
     }
