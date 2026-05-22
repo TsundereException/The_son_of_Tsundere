@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Settings, Package, Heart, ShoppingBag, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 
 const MOCK_MY_LISTINGS = [
@@ -9,6 +11,24 @@ const MOCK_MY_LISTINGS = [
 
 export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState('listings');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) return <div className="p-8 text-center text-gray-500">Завантаження профілю...</div>;
+
+  const initials = user.first_name ? user.first_name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+  const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.username;
+  
+  let formattedDate = 'невідомо';
+  if (user.created_at) {
+    const d = new Date(user.created_at);
+    formattedDate = d.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
+  }
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -16,12 +36,12 @@ export default function UserProfilePage() {
       <aside className="w-full lg:w-80 flex-shrink-0">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-bold mb-4">
-              ІК
+            <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-3xl font-bold mb-4 uppercase">
+              {initials}
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Іван Користувач</h2>
-            <p className="text-gray-500 mb-2">ivan.kor@example.com</p>
-            <p className="text-sm text-gray-400 mb-6">На сайті з травня 2026</p>
+            <h2 className="text-xl font-bold text-gray-900">{fullName}</h2>
+            <p className="text-gray-500 mb-2">{user.email}</p>
+            <p className="text-sm text-gray-400 mb-6">На сайті з {formattedDate}</p>
             
             <button className="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2 rounded-md transition-colors border border-gray-200">
               <Settings className="w-4 h-4" />
@@ -53,7 +73,10 @@ export default function UserProfilePage() {
                 Улюблене
               </button>
               
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors mt-8">
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors mt-8"
+              >
                 <LogOut className="w-5 h-5" />
                 Вийти
               </button>

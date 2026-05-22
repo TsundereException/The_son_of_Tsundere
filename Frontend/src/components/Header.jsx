@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Search, User, PlusCircle } from 'lucide-react';
+import { Search, User, PlusCircle, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -46,12 +46,6 @@ export default function Header() {
                   <User className="h-5 w-5" />
                   <span className="hidden sm:block">{user.first_name || 'Профіль'}</span>
                 </Link>
-                <button
-                  onClick={logout}
-                  className="text-gray-500 hover:text-red-600 px-3 py-2 text-sm font-medium hidden sm:block"
-                >
-                  Вийти
-                </button>
               </div>
             ) : (
               <Link
@@ -59,6 +53,16 @@ export default function Header() {
                 className="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
               >
                 Увійти
+              </Link>
+            )}
+
+            {user && (user.role === 'admin' || user.is_staff || user.is_superuser) && (
+              <Link
+                to="/admin"
+                className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors hidden sm:flex"
+              >
+                <Shield className="h-5 w-5" />
+                <span>Адмін-панель</span>
               </Link>
             )}
 

@@ -9,8 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name',
-                  'role', 'phone', 'avatar', 'bio', 'created_at']
-        read_only_fields = ['id', 'created_at']
+                  'role', 'phone', 'avatar', 'bio', 'created_at',
+                  'is_staff', 'is_superuser']
+        read_only_fields = ['id', 'created_at', 'is_staff', 'is_superuser']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -39,7 +40,23 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """JWT токен з додатковими даними користувача"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'] = serializers.CharField()
+        if 'username' in self.fields:
+            del self.fields['username']
+
     def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = User.objects.filter(email=email).first()
+            if user:
+                attrs['username'] = user.username
+            else:
+                raise serializers.ValidationError({'email': 'Користувача з таким email не знайдено.'})
+
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user).data
         return data

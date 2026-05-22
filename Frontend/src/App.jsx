@@ -7,6 +7,13 @@ import UserProfilePage from './pages/UserProfilePage';
 import AuthPage from './pages/AuthPage';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminUsersPage from './pages/AdminUsersPage';
+import AdminListingsPage from './pages/AdminListingsPage';
+import AdminCategoriesPage from './pages/AdminCategoriesPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
+import AdminOrdersPage from './pages/AdminOrdersPage';
+import AdminReportsPage from './pages/AdminReportsPage';
+import AdminReviewsPage from './pages/AdminReviewsPage';
 
 function App() {
   return (
@@ -24,7 +31,13 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          {/* Add more admin routes here later */}
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="listings" element={<AdminListingsPage />} />
+          <Route path="categories" element={<AdminCategoriesPage />} />
+          <Route path="reports" element={<AdminReportsPage />} />
+          <Route path="reviews" element={<AdminReviewsPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
