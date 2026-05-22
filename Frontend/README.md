@@ -1,16 +1,121 @@
-# React + Vite
+# The Son of Tsundere 🛒
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Сучасний та стильний маркетплейс, побудований за допомогою React, Vite та Tailwind CSS. 
+Цей проєкт створений з фокусом на чудовий UX/UI, високу продуктивність та легку підтримку.
 
-Currently, two official plugins are available:
+## 🚀 Стек технологій
+- **Core:** [React](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Routing:** [React Router v6](https://reactrouter.com/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Testing:** [Vitest](https://vitest.dev/) + React Testing Library
+- **Documentation:** [Storybook](https://storybook.js.org/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🛠 Запуск та Встановлення
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Вам знадобиться Node.js (рекомендована версія 18+).
 
-## Expanding the ESLint configuration
+```bash
+# 1. Клонувати репозиторій
+git clone <repository_url>
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# 2. Перейти в папку Frontend
+cd Frontend
+
+# 3. Встановити залежності
+npm install
+
+# 4. Запустити локальний сервер розробки
+npm run dev
+```
+
+Після цього додаток буде доступний за адресою `http://localhost:5173`.
+
+---
+
+## 🏗 Архітектура проєкту
+
+Проєкт має чітку модульну структуру.
+
+```text
+Frontend/
+├── .storybook/       # Конфігурація Storybook
+├── src/
+│   ├── components/   # Перевикористовувані UI-компоненти (ProductCard, Header тощо)
+│   ├── layouts/      # Макетні компоненти (MainLayout, AdminLayout)
+│   ├── pages/        # Компоненти цілих сторінок (HomePage, CatalogPage, AuthPage)
+│   ├── App.jsx       # Головна точка входу і конфігурація маршрутизації (Router)
+│   ├── index.css     # Головний файл стилів, імпорт Tailwind CSS
+│   └── main.jsx      # Монтування React додатку
+```
+
+**Маршрутизація (Router Map):**
+- `/` — Головна сторінка.
+- `/catalog` — Каталог товарів із фільтрами.
+- `/product/:id` — Детальна сторінка товару.
+- `/auth` — Сторінка авторизації (Вхід / Реєстрація).
+- `/profile` — Особистий кабінет користувача.
+- `/admin` — Панель адміністратора (Дашборд, користувачі, оголошення).
+
+**State Management (Управління станом):**
+Наразі проєкт використовує локальний стан React (`useState`, `useEffect`) для роботи з UI та відображення статичних мок-даних. При підключенні бекенду планується перехід на глобальний менеджер станів (наприклад, Redux Toolkit або Zustand).
+
+---
+
+## 📖 Документація компонентів (Storybook)
+
+Ми використовуємо **Storybook** для ізольованої розробки та інтерактивного перегляду всіх UI-компонентів нашого проєкту.
+
+Щоб запустити документацію:
+```bash
+npm run storybook
+```
+Відкриється сторінка `http://localhost:6006`, де ви зможете побачити всі компоненти, їх варіації (props), та протестувати їхню поведінку.
+
+Крім того, більшість компонентів покриті детальними **JSDoc-коментарями** прямо в коді файлів. Це забезпечує зручні підказки (IntelliSense) у вашому редакторі коду.
+
+---
+
+## 🧪 Тестування
+
+Проєкт покритий юніт-тестами за допомогою **Vitest**. Усі тести знаходяться в папках `__tests__` біля відповідних компонентів або сторінок.
+
+Для запуску тестів:
+```bash
+# Запустити всі тести один раз
+npm run test
+
+# Запустити тести з UI інтерфейсом (потребує @vitest/ui)
+npm run test:ui
+```
+
+При створенні нових ключових UI-елементів (таких як форми, фільтри, таби) обов'язково покривайте їх тестами для перевірки рендеру та взаємодії користувача.
+
+---
+
+## 👨‍💻 Гайди з кодування (Guidelines)
+
+Щоб код залишався чистим та консистентним, просимо дотримуватись таких правил:
+- **Tailwind CSS:** Не використовуйте інлайн-стилі (`style={{...}}`). Всі стилі мають задаватись через класи Tailwind.
+- **Компоненти:** Один компонент = один файл. Файли компонентів мають бути з великої літери (PascalCase), наприклад `ProductCard.jsx`.
+- **Експорти:** Використовуйте `export default function ComponentName()`.
+- **Дані:** Поки бекенд не готовий, усі мок-дані повинні зберігатися у вигляді констант на початку файлу (наприклад, `const MOCK_PRODUCTS = [...]`) або в окремому файлі `src/mocks/`.
+
+---
+
+## 🚢 Розгортання (Deployment)
+
+Створення production-збірки:
+```bash
+npm run build
+```
+Після успішної збірки папка `dist` міститиме всі оптимізовані файли.
+
+**Рекомендовані платформи для деплою Frontend'у:**
+- **Vercel** (Найкраще для Vite/React).
+- **Netlify**.
+- **GitHub Pages**.
+
+Для автоматичного розгортання просто підключіть ваш GitHub репозиторій до Vercel — деплой буде відбуватися автоматично при кожному пуші в гілку `main`.
