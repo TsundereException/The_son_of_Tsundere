@@ -165,6 +165,18 @@ export default function CatalogFilters({ onFilterChange }) {
     });
   };
 
+  const getDropdownText = (attr) => {
+    if (attr.type === 'range') {
+      const min = localFilters.attributes[attr.slug]?.min;
+      const max = localFilters.attributes[attr.slug]?.max;
+      if (min || max) return `${min || ''} - ${max || '...'}`;
+      return 'Від: - До:';
+    }
+    const selected = localFilters.attributes[attr.slug];
+    if (selected && selected.length > 0) return `${selected.length} обрано`;
+    return 'Всі оголошення';
+  };
+
   return (
     <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col">
       {/* Top Search Bar (Optional depending on global layout, but included for OLX look) */}
@@ -236,8 +248,9 @@ export default function CatalogFilters({ onFilterChange }) {
               }`}>
                 {/* Left Column */}
                 <div className={`${hasSubcats ? 'w-1/2 border-r border-gray-100' : 'w-full'} p-2 max-h-[400px] overflow-y-auto custom-scrollbar`}>
-                  <div 
-                    className="px-3 py-2.5 mb-1 rounded-xl hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-700 font-medium transition-colors"
+                  <button 
+                    type="button"
+                    className="w-full text-left px-3 py-2.5 mb-1 rounded-xl hover:bg-gray-50 cursor-pointer flex justify-between items-center text-gray-700 font-medium transition-colors"
                     onClick={() => {
                        handleCategorySelect('');
                        setHoveredCategory(null);
@@ -245,11 +258,12 @@ export default function CatalogFilters({ onFilterChange }) {
                     onMouseEnter={() => setHoveredCategory(null)}
                   >
                     <span>Будь-яка категорія</span>
-                  </div>
+                  </button>
                   {categories.map(cat => {
                     const isHighlighted = hoveredCategory ? hoveredCategory.id === cat.id : localFilters.category === String(cat.id);
                     return (
-                      <div 
+                      <button 
+                        type="button"
                         key={cat.id} 
                         className={`px-3 py-2.5 mb-1 cursor-pointer flex justify-between items-center rounded-xl transition-all duration-300 ${
                           isHighlighted 
@@ -274,15 +288,16 @@ export default function CatalogFilters({ onFilterChange }) {
                             <ChevronDown className="w-4 h-4 -rotate-90 opacity-70" />
                           )}
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
                 {/* Right Column */}
                 {hasSubcats && (
                   <div className="w-1/2 p-2 bg-gradient-to-br from-gray-50/50 to-indigo-50/30 max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <div 
-                      className="px-4 py-3 cursor-pointer font-bold bg-gradient-to-r from-indigo-100/50 to-violet-100/50 text-indigo-900 border border-indigo-100/50 rounded-xl mb-2 flex justify-between items-center shadow-sm"
+                    <button 
+                      type="button"
+                      className="w-full text-left px-4 py-3 cursor-pointer font-bold bg-gradient-to-r from-indigo-100/50 to-violet-100/50 text-indigo-900 border border-indigo-100/50 rounded-xl mb-2 flex justify-between items-center shadow-sm"
                       onClick={() => handleCategorySelect(String(currentCat.id))}
                     >
                       <span>Все в {currentCat.name}</span>
@@ -291,12 +306,13 @@ export default function CatalogFilters({ onFilterChange }) {
                           {currentCat.product_count}
                         </span>
                       )}
-                    </div>
+                    </button>
                     <div className="space-y-1">
                       {currentCat.children.map(sub => (
-                        <div 
+                        <button 
+                          type="button"
                           key={sub.id} 
-                          className={`px-3 py-2 cursor-pointer flex justify-between items-center rounded-lg transition-colors ${
+                          className={`w-full text-left px-3 py-2 cursor-pointer flex justify-between items-center rounded-lg transition-colors ${
                             localFilters.subcategory === String(sub.id) 
                               ? 'bg-indigo-100/50 font-semibold text-indigo-900' 
                               : 'hover:bg-white hover:shadow-sm text-gray-700 font-medium'
@@ -312,7 +328,7 @@ export default function CatalogFilters({ onFilterChange }) {
                               {sub.product_count}
                             </span>
                           )}
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -384,17 +400,12 @@ export default function CatalogFilters({ onFilterChange }) {
                ) : (
                  <>
                    <button 
+                     type="button"
                      onClick={() => toggleDropdown(`attr_${attr.slug}`)}
                      className="flex items-center justify-between w-48 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:border-gray-300 focus:outline-none"
                    >
                      <span className="truncate">
-                        {attr.type === 'range' 
-                          ? (localFilters.attributes[attr.slug]?.min || localFilters.attributes[attr.slug]?.max 
-                              ? `${localFilters.attributes[attr.slug]?.min || ''} - ${localFilters.attributes[attr.slug]?.max || '...'}` 
-                              : 'Від: - До:')
-                          : ((localFilters.attributes[attr.slug] && localFilters.attributes[attr.slug].length > 0)
-                              ? `${localFilters.attributes[attr.slug].length} обрано`
-                              : 'Всі оголошення')}
+                        {getDropdownText(attr)}
                      </span>
                      <ChevronDown className="w-4 h-4 text-gray-400 ml-2" />
                    </button>

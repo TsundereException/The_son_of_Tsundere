@@ -104,7 +104,7 @@ export default function UserProfilePage() {
       setActiveTab('listings');
       setTimeout(() => setActiveTab('sales'), 0);
     } catch (e) {
-      window.alert(e.response?.data?.detail || 'Помилка');
+      globalThis.alert(e.response?.data?.detail || 'Помилка');
     }
   };
 
@@ -308,10 +308,11 @@ export default function UserProfilePage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-6">Налаштування профілю</h1>
             <div className="max-w-md">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                 Ваше місто (для розрахунку відстані)
               </label>
               <select
+                id="city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2 border"
@@ -326,9 +327,9 @@ export default function UserProfilePage() {
                   setIsUpdating(true);
                   try {
                     await updateProfile({ city });
-                    window.alert('Профіль оновлено!');
+                    globalThis.alert('Профіль оновлено!');
                   } catch (e) {
-                    window.alert('Помилка оновлення');
+                    globalThis.alert('Помилка оновлення');
                   } finally {
                     setIsUpdating(false);
                   }

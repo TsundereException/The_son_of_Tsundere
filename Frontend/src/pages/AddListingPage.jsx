@@ -106,7 +106,7 @@ export default function AddListingPage() {
       // 1. Create Product
       const productResponse = await apiClient.post('/products/create/', {
         name: formData.name,
-        category_id: parseInt(formData.category_id),
+        category_id: Number.parseInt(formData.category_id, 10),
         description: formData.description,
         price: finalPrice,
         is_negotiable: isNegotiable,
@@ -226,10 +226,11 @@ export default function AddListingPage() {
           {/* Details Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                 Назва товару <span className="text-red-500">*</span>
               </label>
               <input
+                id="name"
                 type="text"
                 name="name"
                 value={formData.name}
@@ -284,7 +285,9 @@ export default function AddListingPage() {
               {priceType === 'price' && (
                 <div className="flex items-center gap-4">
                   <div className="relative flex-1">
+                    <label htmlFor="price" className="sr-only">Ціна</label>
                     <input
+                      id="price"
                       type="number"
                       name="price"
                       value={formData.price}
@@ -338,10 +341,11 @@ export default function AddListingPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                 Опис <span className="text-red-500">*</span>
               </label>
               <textarea
+                id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
@@ -418,10 +422,11 @@ export default function AddListingPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                     Місто
                   </label>
                   <select
+                    id="city"
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
@@ -435,10 +440,11 @@ export default function AddListingPage() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="contact_name" className="block text-sm font-medium text-gray-700 mb-1">
                     Контактна особа
                   </label>
                   <input
+                    id="contact_name"
                     type="text"
                     value={user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.email?.split('@')[0] || ''}
                     disabled
@@ -448,10 +454,11 @@ export default function AddListingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email-адреса
                   </label>
                   <input
+                    id="email"
                     type="email"
                     value={user?.email || ''}
                     disabled
@@ -460,10 +467,11 @@ export default function AddListingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                     Номер телефону
                   </label>
                   <input
+                    id="phone"
                     type="tel"
                     value={user?.phone || ''}
                     disabled

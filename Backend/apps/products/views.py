@@ -123,21 +123,26 @@ class ProductListView(generics.ListAPIView):
         return qs
 
     def filter_queryset(self, queryset):
-        # НЕ використовуємо filterset_fields для category — ми обробляємо самостійно
         queryset = super().filter_queryset(queryset)
         params = self.request.query_params
 
-        # Ієрархічна фільтрація по категорії:
-        # Якщо обрано батьківську категорію — показуємо товари з усіх дочірніх
+        queryset = self._filter_by_category(queryset, params)
+        queryset = self._filter_by_price_and_photo(queryset, params)
+        queryset = self._filter_by_dynamic_attributes(queryset, params)
+
+        return queryset
+
+    def _filter_by_category(self, queryset, params):
         category_id = params.get('category')
         if category_id:
             try:
                 all_ids = _get_category_descendants(int(category_id))
-                queryset = queryset.filter(category_id__in=all_ids)
+                return queryset.filter(category_id__in=all_ids)
             except (ValueError, TypeError):
                 pass
+        return queryset
 
-        # Фільтрація по ціні
+    def _filter_by_price_and_photo(self, queryset, params):
         min_price = params.get('min_price')
         if min_price:
             queryset = queryset.filter(price__gte=min_price)
@@ -146,13 +151,13 @@ class ProductListView(generics.ListAPIView):
         if max_price:
             queryset = queryset.filter(price__lte=max_price)
 
-        # Фільтрація 'Тільки з фото'
         has_photo = params.get('has_photo')
         if has_photo and has_photo.lower() == 'true':
-            # Шукаємо товари, у яких є хоча б одне зображення
             queryset = queryset.filter(images__isnull=False).distinct()
+            
+        return queryset
 
-        # Динамічні атрибути (напр. attr_brand=Apple,Samsung, attr_year_min=2010)
+    def _filter_by_dynamic_attributes(self, queryset, params):
         for key, value in params.items():
             if key.startswith('attr_') and value:
                 attr_name = key[5:]
@@ -165,14 +170,11 @@ class ProductListView(generics.ListAPIView):
                 else:
                     attr_slug = attr_name
                     values = value.split(',')
-                    # OR логіка для значень одного атрибута (значення можуть зберігатися як масиви)
                     q_objects = Q()
                     for v in values:
-                        # Шукаємо і точний збіг (для старих даних), і збіг у масиві (для нових даних)
                         q_objects |= Q(**{f"attributes__{attr_slug}": v})
                         q_objects |= Q(**{f"attributes__{attr_slug}__contains": v})
                     queryset = queryset.filter(q_objects)
-
         return queryset
 
 

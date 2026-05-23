@@ -115,3 +115,23 @@ export default function ProductCard({ product, layout = 'grid' }) {
     </Link>
   );
 }
+
+import PropTypes from 'prop-types';
+
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    slug: PropTypes.string,
+    name: PropTypes.string,
+    title: PropTypes.string,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    location: PropTypes.string,
+    city: PropTypes.string,
+    date: PropTypes.string,
+    created_at: PropTypes.string,
+    condition: PropTypes.string,
+    main_image: PropTypes.string,
+    imageUrl: PropTypes.string,
+  }).isRequired,
+  layout: PropTypes.oneOf(['grid', 'list']),
+};

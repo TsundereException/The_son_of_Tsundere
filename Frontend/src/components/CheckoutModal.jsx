@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, CreditCard, MapPin, Truck } from 'lucide-react';
 import apiClient from '../api/client';
 import { useNavigate } from 'react-router-dom';
@@ -36,10 +37,10 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
         payload.delivery_provider = formData.delivery_provider;
         payload.card_number = formData.card_number;
         await apiClient.post('/orders/safe-buy/', payload);
-        window.alert('Безпечну угоду оформлено успішно! Гроші зарезервовані.');
+        globalThis.alert('Безпечну угоду оформлено успішно! Гроші зарезервовані.');
       } else {
         await apiClient.post('/orders/create/', payload);
-        window.alert('Замовлення оформлено!');
+        globalThis.alert('Замовлення оформлено!');
       }
 
       onClose();
@@ -103,10 +104,11 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Відділення / Адреса</label>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Відділення / Адреса</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input 
+                      id="address"
                       type="text" 
                       required 
                       value={formData.address}
@@ -118,8 +120,9 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Коментар до замовлення</label>
+                  <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">Коментар до замовлення</label>
                   <textarea 
+                    id="comment"
                     value={formData.comment}
                     onChange={(e) => setFormData({...formData, comment: e.target.value})}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
@@ -140,8 +143,9 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Номер картки (Тестовий)</label>
+                  <label htmlFor="card_number" className="block text-sm font-medium text-gray-700 mb-1">Номер картки (Тестовий)</label>
                   <input 
+                    id="card_number"
                     type="text" 
                     required 
                     value={formData.card_number}
@@ -153,12 +157,12 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Термін дії</label>
-                    <input type="text" placeholder="MM/YY" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
+                    <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">Термін дії</label>
+                    <input id="expiry" type="text" placeholder="MM/YY" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                    <input type="password" placeholder="123" maxLength="3" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
+                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                    <input id="cvv" type="password" placeholder="123" maxLength="3" className="w-full px-4 py-3 rounded-lg border border-gray-300 outline-none" />
                   </div>
                 </div>
               </div>
@@ -191,3 +195,15 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
     </div>
   );
 }
+
+CheckoutModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  product: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    images: PropTypes.array
+  }).isRequired,
+  isSafeDeal: PropTypes.bool
+};

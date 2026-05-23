@@ -25,9 +25,9 @@ class Order(models.Model):
     comment    = models.TextField(blank=True, verbose_name='Коментар')
     
     # Safe Deal / Delivery fields
-    delivery_provider = models.CharField(max_length=50, blank=True, null=True, verbose_name='Служба доставки')
-    tracking_number   = models.CharField(max_length=100, blank=True, null=True, verbose_name='ТТН')
-    payment_hold_id   = models.CharField(max_length=255, blank=True, null=True, verbose_name='ID холдування коштів')
+    delivery_provider = models.CharField(max_length=50, blank=True, default='', verbose_name='Служба доставки')
+    tracking_number   = models.CharField(max_length=100, blank=True, default='', verbose_name='ТТН')
+    payment_hold_id   = models.CharField(max_length=255, blank=True, default='', verbose_name='ID холдування коштів')
     expires_at        = models.DateTimeField(blank=True, null=True, verbose_name='Дійсне до')
 
     created_at = models.DateTimeField(auto_now_add=True)
