@@ -17,6 +17,7 @@ class Listing(models.Model):
     title       = models.CharField(max_length=200, verbose_name='Назва')
     description = models.TextField(verbose_name='Опис')
     price       = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Ціна')
+    city        = models.CharField(max_length=50, blank=True, verbose_name='Місто')
     photo       = models.CharField(max_length=255, blank=True, verbose_name='Фото')
     avatar      = models.CharField(max_length=255, blank=True, verbose_name='Аватар оголошення')
     status      = models.CharField(max_length=10, choices=STATUS,

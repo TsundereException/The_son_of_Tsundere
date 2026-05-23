@@ -25,9 +25,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if os.getenv('DEBUG', 'False') == 'True':
+        SECRET_KEY = 'insecure-default-key-for-dev'
+    else:
+        raise ValueError("SECRET_KEY must be set in production")
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Security Headers (SonarQube requirements)
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+# In a real prod environment with HTTPS, you should also enable:
+# SECURE_SSL_REDIRECT = not DEBUG
+# SESSION_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_SECURE = not DEBUG
 
 
 
@@ -51,6 +68,7 @@ INSTALLED_APPS = [
     'apps.products',
     'apps.orders',
     'apps.listings',
+    'apps.chat',
 ]
 
 MIDDLEWARE = [
@@ -172,3 +190,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LANGUAGE_CODE = 'uk'
 TIME_ZONE = 'Europe/Kyiv'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -35,7 +35,7 @@ class AdminCategorySerializer(serializers.ModelSerializer):
 class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
-        fields = ['maintenance_mode', 'platform_commission', 'support_email']
+        fields = ['maintenance_mode', 'platform_commission', 'support_email', 'hide_generated_data']
 
 class AdminSettingsAPIView(APIView):
     permission_classes = [IsAdminUserOrRoleAdmin]

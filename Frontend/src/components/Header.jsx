@@ -66,10 +66,13 @@ export default function Header() {
               </Link>
             )}
 
-            <button className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+            <Link 
+              to={user ? "/add-listing" : "/auth"}
+              className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            >
               <PlusCircle className="h-5 w-5" />
               <span className="hidden sm:block">Додати оголошення</span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

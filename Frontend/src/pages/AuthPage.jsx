@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(location.state?.isLogin ?? true);
   const { login, register } = useAuth();
   const navigate = useNavigate();
 

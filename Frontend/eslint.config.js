@@ -15,7 +15,10 @@ export default defineConfig([globalIgnores(['dist']), {
     reactRefresh.configs.vite,
   ],
   languageOptions: {
-    globals: globals.browser,
+    globals: { ...globals.browser, ...globals.jest, ...globals.node },
     parserOptions: { ecmaFeatures: { jsx: true } },
   },
+  rules: {
+    'react-hooks/set-state-in-effect': 'off'
+  }
 }, ...storybook.configs["flat/recommended"]])

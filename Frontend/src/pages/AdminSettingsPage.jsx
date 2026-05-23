@@ -6,7 +6,8 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({
     maintenance_mode: false,
     platform_commission: 5.0,
-    support_email: ''
+    support_email: '',
+    hide_generated_data: false
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -19,7 +20,8 @@ export default function AdminSettingsPage() {
         setSettings({
           maintenance_mode: data.maintenance_mode,
           platform_commission: parseFloat(data.platform_commission),
-          support_email: data.support_email
+          support_email: data.support_email,
+          hide_generated_data: data.hide_generated_data
         });
       } catch (error) {
         console.error('Failed to fetch settings:', error);
@@ -30,12 +32,26 @@ export default function AdminSettingsPage() {
     fetchSettings();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    
     setSettings(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: newValue
     }));
+
+    // Миттєве збереження для тумблерів (checkbox)
+    if (type === 'checkbox') {
+      try {
+        await apiClient.put('/auth/admin/settings/', { ...settings, [name]: newValue });
+        setMessage('Статус оновлено!');
+        setTimeout(() => setMessage(''), 3000);
+      } catch (error) {
+        console.error('Failed to quick-save setting:', error);
+        setMessage('Помилка при збереженні.');
+      }
+    }
   };
 
   const handleSave = async (e) => {
@@ -82,6 +98,25 @@ export default function AdminSettingsPage() {
                 style={{ top: '0', left: settings.maintenance_mode ? '1.5rem' : '0', right: '0' }}
               />
               <label htmlFor="maintenance_mode" className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${settings.maintenance_mode ? 'bg-indigo-600' : 'bg-gray-300'}`}></label>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border rounded-xl border-gray-200">
+            <div>
+              <label className="font-medium text-gray-900 block">Приховати тестові оголошення</label>
+              <span className="text-sm text-gray-500">Якщо увімкнено, згенеровані тестові оголошення не відображатимуться на сайті.</span>
+            </div>
+            <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+              <input 
+                type="checkbox" 
+                name="hide_generated_data" 
+                id="hide_generated_data"
+                checked={settings.hide_generated_data}
+                onChange={handleChange}
+                className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-indigo-600 focus:outline-none transition-all duration-300"
+                style={{ top: '0', left: settings.hide_generated_data ? '1.5rem' : '0', right: '0' }}
+              />
+              <label htmlFor="hide_generated_data" className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${settings.hide_generated_data ? 'bg-indigo-600' : 'bg-gray-300'}`}></label>
             </div>
           </div>
 
