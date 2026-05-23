@@ -29,7 +29,7 @@ export default function AdminUsersPage() {
       fetchUsers(); // reload
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      alert('Не вдалося змінити статус користувача');
+      window.alert('Не вдалося змінити статус користувача');
     }
   };
 
@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to change role:', error);
-      alert('Не вдалося змінити роль користувача');
+      window.alert('Не вдалося змінити роль користувача');
     }
   };
 

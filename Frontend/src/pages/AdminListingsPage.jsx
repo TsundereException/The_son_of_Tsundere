@@ -27,7 +27,7 @@ export default function AdminListingsPage() {
       fetchListings();
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      alert('Не вдалося змінити статус оголошення');
+      window.alert('Не вдалося змінити статус оголошення');
     }
   };
 
@@ -38,7 +38,7 @@ export default function AdminListingsPage() {
         fetchListings();
       } catch (error) {
         console.error('Failed to delete listing:', error);
-        alert('Не вдалося видалити оголошення');
+        window.alert('Не вдалося видалити оголошення');
       }
     }
   };

@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import CatalogPage from './pages/CatalogPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import UserProfilePage from './pages/UserProfilePage';
+import AddListingPage from './pages/AddListingPage';
+import EditListingPage from './pages/EditListingPage';
+import ChatPage from './pages/ChatPage';
 import AuthPage from './pages/AuthPage';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
@@ -25,6 +28,10 @@ function App() {
           <Route path="catalog" element={<CatalogPage />} />
           <Route path="product/:id" element={<ProductDetailsPage />} />
           <Route path="profile" element={<UserProfilePage />} />
+          <Route path="add-listing" element={<AddListingPage />} />
+          <Route path="edit-listing/:slug" element={<EditListingPage />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="chat/:sellerId" element={<ChatPage />} />
           <Route path="auth" element={<AuthPage />} />
         </Route>
 

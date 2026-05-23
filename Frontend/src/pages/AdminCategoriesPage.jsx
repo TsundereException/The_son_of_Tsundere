@@ -37,7 +37,7 @@ export default function AdminCategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Failed to add category:', error);
-      alert('Помилка при створенні категорії (можливо такий slug вже існує)');
+      window.alert('Помилка при створенні категорії (можливо такий slug вже існує)');
     }
   };
 
@@ -48,7 +48,7 @@ export default function AdminCategoriesPage() {
         fetchCategories();
       } catch (error) {
         console.error('Failed to delete category:', error);
-        alert('Не вдалося видалити категорію');
+        window.alert('Не вдалося видалити категорію');
       }
     }
   };
@@ -67,7 +67,7 @@ export default function AdminCategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Failed to update category:', error);
-      alert('Не вдалося оновити категорію');
+      window.alert('Не вдалося оновити категорію');
     }
   };
 

@@ -11,8 +11,10 @@ class User(AbstractUser):
 
     role       = models.CharField(max_length=10, choices=ROLES, default='buyer')
     phone      = models.CharField(max_length=20, blank=True)
+    city       = models.CharField(max_length=50, blank=True, verbose_name='Місто')
     avatar     = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio        = models.TextField(blank=True)
+    payout_card = models.CharField(max_length=19, blank=True, verbose_name='Картка для виплат (Безпечна угода)')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,6 +37,7 @@ class SiteSettings(models.Model):
     maintenance_mode = models.BooleanField(default=False, verbose_name="Режим обслуговування")
     platform_commission = models.DecimalField(max_digits=5, decimal_places=2, default=5.00, verbose_name="Комісія платформи (%)")
     support_email = models.EmailField(default="support@tsundere.com", verbose_name="Email підтримки")
+    hide_generated_data = models.BooleanField(default=False, verbose_name="Приховати тестові оголошення")
     
     class Meta:
         verbose_name = "Налаштування сайту"

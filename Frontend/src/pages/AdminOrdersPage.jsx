@@ -22,12 +22,16 @@ export default function AdminOrdersPage() {
   }, []);
 
   const changeStatus = async (id, currentStatus) => {
-    const statuses = ['pending', 'paid', 'shipped', 'delivered', 'cancelled'];
+    const statuses = ['pending', 'paid', 'payment_held', 'seller_pending', 'shipped', 'delivered', 'returned', 'completed', 'cancelled'];
     const statusMap = {
       pending: 'Очікує оплати',
       paid: 'Оплачено',
+      payment_held: 'Кошти зарезервовано',
+      seller_pending: 'Очікує відправки',
       shipped: 'Відправлено',
       delivered: 'Доставлено',
+      returned: 'Повернено',
+      completed: 'Завершено',
       cancelled: 'Скасовано',
     };
     const statusOptions = statuses.map((s, i) => `${i + 1}. ${statusMap[s]}`).join('\n');
@@ -40,7 +44,7 @@ export default function AdminOrdersPage() {
         fetchOrders();
       } catch (error) {
         console.error('Failed to update status:', error);
-        alert('Помилка при оновленні статусу');
+        window.alert('Помилка при оновленні статусу');
       }
     }
   };

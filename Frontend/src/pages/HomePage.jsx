@@ -1,6 +1,11 @@
-import { Smartphone, Laptop, Camera, Watch, Tv, Headphones } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import * as LucideIcons from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import apiClient from '../api/client';
 import ProductCard from '../components/ProductCard';
+import { useAuth } from '../context/AuthContext';
+
 
 const MOCK_PRODUCTS = [
   { id: 1, title: 'MacBook Pro M2 2023', price: '45000', location: 'Київ', date: 'Сьогодні', condition: 'New', imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=600' },
@@ -9,17 +14,35 @@ const MOCK_PRODUCTS = [
   { id: 4, title: 'iPhone 15 Pro Max', price: '52000', location: 'Дніпро', date: '2 дні тому', condition: 'New', imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=600' },
 ];
 
-const CATEGORIES = [
-  { name: 'Смартфони', icon: Smartphone, color: 'bg-blue-100 text-blue-600', slug: 'smartphones' },
-  { name: 'Ноутбуки', icon: Laptop, color: 'bg-purple-100 text-purple-600', slug: 'laptops' },
-  { name: 'Камери', icon: Camera, color: 'bg-amber-100 text-amber-600', slug: 'cameras' },
-  { name: 'Годинники', icon: Watch, color: 'bg-green-100 text-green-600', slug: 'watches' },
-  { name: 'Телевізори', icon: Tv, color: 'bg-red-100 text-red-600', slug: 'tvs' },
-  { name: 'Аксесуари', icon: Headphones, color: 'bg-gray-100 text-gray-600', slug: 'accessories' },
-];
-
+// Helper to get icon by name
+const getIconComponent = (iconName) => {
+  if (!iconName) return LucideIcons.Folder;
+  const Icon = LucideIcons[iconName];
+  return Icon ? Icon : LucideIcons.Folder;
+};
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // Fetch categories from API
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await apiClient.get('/products/categories/');
+      return response.data.results || response.data;
+    },
+  });
+
+  const handleCategoryClick = (category) => {
+    if (activeCategory?.id === category.id) {
+      setActiveCategory(null); // toggle off
+    } else {
+      setActiveCategory(category);
+    }
+  };
+
   return (
     <div className="space-y-12">
       {/* Hero Section */}
@@ -31,7 +54,16 @@ export default function HomePage() {
           <p className="text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto mb-8">
             The Son of Tsundere - найкраще місце для вигідних покупок та швидких продажів.
           </p>
-          <button className="bg-white text-indigo-600 font-bold px-8 py-3 rounded-full text-lg shadow-lg hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => {
+              if (user) {
+                navigate('/add-listing');
+              } else {
+                navigate('/auth', { state: { isLogin: false } });
+              }
+            }}
+            className="bg-white text-indigo-600 font-bold px-8 py-3 rounded-full text-lg shadow-lg hover:bg-gray-50 transition-colors"
+          >
             Розмістити оголошення
           </button>
         </div>
@@ -42,26 +74,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Categories Section (OLX Style) */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Популярні категорії</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon;
+        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Розділи на сервісі</h2>
+        
+        {/* Horizontal row of categories */}
+        <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
+          {categoriesData?.map((category) => {
+            const Icon = getIconComponent(category.icon_name);
+            const colorClass = category.color || 'bg-gray-100 text-gray-600';
+            const isActive = activeCategory?.id === category.id;
+            
             return (
-              <Link 
-                to={`/catalog?category=${category.slug}`} 
-                key={category.name} 
-                className="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group"
+              <div 
+                key={category.id} 
+                className="flex flex-col items-center cursor-pointer group"
+                onClick={() => handleCategoryClick(category)}
               >
-                <div className={`p-4 rounded-full ${category.color} group-hover:scale-110 transition-transform mb-3`}>
-                  <Icon className="w-8 h-8" />
+                <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center ${colorClass} group-hover:scale-105 transition-transform ${isActive ? 'ring-4 ring-indigo-500 ring-offset-2' : ''}`}>
+                  <Icon className="w-10 h-10 sm:w-12 sm:h-12" />
                 </div>
-                <span className="font-medium text-gray-700">{category.name}</span>
-              </Link>
+                <span className="mt-3 font-medium text-gray-800 text-center text-sm sm:text-base max-w-[100px] leading-tight">
+                  {category.name}
+                </span>
+              </div>
             );
           })}
         </div>
+
+        {/* Expanded Subcategories Panel */}
+        {activeCategory && (
+          <div className="relative mt-4 bg-white border border-gray-200 rounded-xl shadow-lg p-6 sm:p-8 animate-in fade-in slide-in-from-top-4 duration-300">
+            {/* Tiny arrow pointing up (CSS triangle trick) - simplified implementation just visually linking to the row */}
+            
+            <div className="mb-6 border-b border-gray-100 pb-4">
+              <Link 
+                to={`/catalog?category=${activeCategory.id}`}
+                className="text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-2"
+              >
+                <span className="text-lg">&gt;</span> Переглянути всі оголошення в {activeCategory.name}
+              </Link>
+            </div>
+            
+            {activeCategory.children && activeCategory.children.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
+                {activeCategory.children.map(child => (
+                  <Link 
+                    key={child.id}
+                    to={`/catalog?category=${child.id}`}
+                    className="text-gray-700 hover:text-indigo-600 hover:underline flex items-start gap-2"
+                  >
+                    <span className="text-gray-400">&gt;</span> {child.name}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-500 italic">Немає підкатегорій</div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Recent Listings Section */}

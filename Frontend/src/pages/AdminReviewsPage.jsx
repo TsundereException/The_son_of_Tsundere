@@ -28,7 +28,7 @@ export default function AdminReviewsPage() {
         fetchReviews();
       } catch (error) {
         console.error('Failed to delete review:', error);
-        alert('Помилка при видаленні відгуку');
+        window.alert('Помилка при видаленні відгуку');
       }
     }
   };

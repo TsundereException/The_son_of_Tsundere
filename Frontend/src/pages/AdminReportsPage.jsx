@@ -28,7 +28,7 @@ export default function AdminReportsPage() {
         fetchReports();
       } catch (error) {
         console.error('Failed to update report status:', error);
-        alert('Помилка при оновленні статусу');
+        window.alert('Помилка при оновленні статусу');
       }
     }
   };

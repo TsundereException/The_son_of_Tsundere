@@ -6,19 +6,30 @@ from apps.products.models import Product
 class Order(models.Model):
     STATUSES = [
         ('pending',   'Очікує оплати'),
-        ('paid',      'Оплачено'),
-        ('shipped',   'Відправлено'),
-        ('delivered', 'Доставлено'),
+        ('payment_held', 'Кошти зарезервовано (Очікує продавця)'),
+        ('seller_pending', 'Очікує відправки (ТТН згенеровано)'),
+        ('shipped',   'Відправлено (В дорозі)'),
+        ('delivered', 'Доставлено у відділення'),
+        ('completed', 'Угода завершена (Отримано)'),
+        ('returned',  'Повернення (Покупець відмовився)'),
         ('cancelled', 'Скасовано'),
+        ('cancelled_by_timeout', 'Скасовано (Продавець не відправив)'),
     ]
 
     buyer      = models.ForeignKey(User, on_delete=models.CASCADE,
                                    related_name='orders', verbose_name='Покупець')
-    status     = models.CharField(max_length=20, choices=STATUSES,
+    status     = models.CharField(max_length=30, choices=STATUSES,
                                   default='pending', verbose_name='Статус')
     total      = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сума')
     address    = models.TextField(verbose_name='Адреса доставки')
     comment    = models.TextField(blank=True, verbose_name='Коментар')
+    
+    # Safe Deal / Delivery fields
+    delivery_provider = models.CharField(max_length=50, blank=True, default='', verbose_name='Служба доставки')
+    tracking_number   = models.CharField(max_length=100, blank=True, default='', verbose_name='ТТН')
+    payment_hold_id   = models.CharField(max_length=255, blank=True, default='', verbose_name='ID холдування коштів')
+    expires_at        = models.DateTimeField(blank=True, null=True, verbose_name='Дійсне до')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
