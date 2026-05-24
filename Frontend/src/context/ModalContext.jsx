@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const ModalContext = createContext(null);
 
@@ -64,8 +65,10 @@ export const ModalProvider = ({ children }) => {
     });
   }, []);
 
+  const contextValue = useMemo(() => ({ showAlert, showConfirm, showPrompt }), [showAlert, showConfirm, showPrompt]);
+
   return (
-    <ModalContext.Provider value={{ showAlert, showConfirm, showPrompt }}>
+    <ModalContext.Provider value={contextValue}>
       {children}
       
       {modalState && (
@@ -118,4 +121,8 @@ export const ModalProvider = ({ children }) => {
       )}
     </ModalContext.Provider>
   );
+};
+
+ModalProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

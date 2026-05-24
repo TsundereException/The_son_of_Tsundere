@@ -6,7 +6,7 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { CITIES_LIST } from '../utils/distance';
 import CategoryPicker from './CategoryPicker';
-
+import PropTypes from 'prop-types';
 export default function ListingForm({ 
   initialData = null, 
   onSubmit, 
@@ -181,7 +181,7 @@ export default function ListingForm({
                 </div>
               ))}
               {imagePreviews.map((preview, idx) => (
-                <div key={idx} className="relative w-32 h-32 rounded-lg border-2 border-gray-200 overflow-hidden group">
+                <div key={preview} className="relative w-32 h-32 rounded-lg border-2 border-gray-200 overflow-hidden group">
                   <img src={preview} alt={`preview ${idx}`} className="w-full h-full object-cover" />
                   <button 
                     type="button"
@@ -349,37 +349,39 @@ export default function ListingForm({
             </div>
 
             {/* Dynamic Attributes */}
-            {config?.attributes && config.attributes.map(attr => (
-              <div key={attr.id}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {attr.name}
-                </label>
-                {attr.type === 'range' ? (
+            {config?.attributes && config.attributes.map(attr => {
+              const attrId = `attr-${attr.slug}`;
+              const attrValue = formData.attributes[attr.slug] ? formData.attributes[attr.slug][0] : '';
+              const handleAttrChange = (val) => {
+                setFormData(prev => ({
+                  ...prev,
+                  attributes: { ...prev.attributes, [attr.slug]: [val] }
+                }));
+              };
+
+              let inputElement = null;
+
+              if (attr.type === 'range') {
+                inputElement = (
                   <input
+                    id={attrId}
                     type="number"
-                    value={formData.attributes[attr.slug] ? formData.attributes[attr.slug][0] : ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      attributes: { ...formData.attributes, [attr.slug]: [e.target.value] }
-                    })}
+                    value={attrValue}
+                    onChange={(e) => handleAttrChange(e.target.value)}
                     placeholder={`Введіть ${attr.name.toLowerCase()}`}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
                   />
-                ) : attr.options && attr.options.length > 0 && attr.options.length <= 5 ? (
-                  <div className="flex flex-wrap gap-2">
+                );
+              } else if (attr.options && attr.options.length > 0 && attr.options.length <= 5) {
+                inputElement = (
+                  <div className="flex flex-wrap gap-2" id={attrId}>
                     {attr.options.map(opt => {
-                      const isSelected = formData.attributes[attr.slug] && formData.attributes[attr.slug][0] === opt.value;
+                      const isSelected = attrValue === opt.value;
                       return (
                         <button
                           key={opt.id}
                           type="button"
-                          onClick={() => {
-                            const newValue = isSelected ? '' : opt.value;
-                            setFormData({
-                              ...formData,
-                              attributes: { ...formData.attributes, [attr.slug]: [newValue] }
-                            });
-                          }}
+                          onClick={() => handleAttrChange(isSelected ? '' : opt.value)}
                           className={`px-4 py-2 text-sm font-medium rounded-full border transition-colors ${
                             isSelected 
                               ? 'bg-indigo-50 border-indigo-600 text-indigo-700 shadow-sm' 
@@ -391,13 +393,13 @@ export default function ListingForm({
                       );
                     })}
                   </div>
-                ) : (
+                );
+              } else {
+                inputElement = (
                   <select
-                    value={formData.attributes[attr.slug] ? formData.attributes[attr.slug][0] : ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      attributes: { ...formData.attributes, [attr.slug]: [e.target.value] }
-                    })}
+                    id={attrId}
+                    value={attrValue}
+                    onChange={(e) => handleAttrChange(e.target.value)}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
                   >
                     <option value="">Не вказано</option>
@@ -405,9 +407,18 @@ export default function ListingForm({
                       <option key={opt.id} value={opt.value}>{opt.value}</option>
                     ))}
                   </select>
-                )}
-              </div>
-            ))}
+                );
+              }
+
+              return (
+                <div key={attr.id}>
+                  <label htmlFor={attrId} className="block text-sm font-medium text-gray-700 mb-1">
+                    {attr.name}
+                  </label>
+                  {inputElement}
+                </div>
+              );
+            })}
 
             <div className="md:col-span-2 mt-8">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Ваші контактні дані</h2>
@@ -497,3 +508,11 @@ export default function ListingForm({
     </div>
   );
 }
+
+ListingForm.propTypes = {
+  initialData: PropTypes.object,
+  onSubmit: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool,
+  error: PropTypes.string,
+  isEdit: PropTypes.bool
+};

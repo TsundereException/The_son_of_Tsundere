@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext';
 import apiClient from '../api/client';
 
@@ -29,11 +30,21 @@ export const FavoritesProvider = ({ children }) => {
     setFavoritesCount(prev => Math.max(0, prev + change));
   };
 
+  const contextValue = useMemo(() => ({
+    favoritesCount,
+    updateFavoritesCount,
+    fetchFavoritesCount
+  }), [favoritesCount]);
+
   return (
-    <FavoritesContext.Provider value={{ favoritesCount, updateFavoritesCount, fetchFavoritesCount }}>
+    <FavoritesContext.Provider value={contextValue}>
       {children}
     </FavoritesContext.Provider>
   );
+};
+
+FavoritesProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useFavorites = () => useContext(FavoritesContext);

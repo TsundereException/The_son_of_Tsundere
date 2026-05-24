@@ -17,7 +17,13 @@ export default function EditListingPage() {
       try {
         const response = await apiClient.get(`/products/${slug}/`);
         const product = response.data;
-        
+        let priceType = 'price';
+        if (product.is_free) {
+          priceType = 'free';
+        } else if (product.is_exchange) {
+          priceType = 'exchange';
+        }
+
         setInitialData({
           name: product.name || '',
           category_id: product.category?.id || '',
@@ -27,7 +33,7 @@ export default function EditListingPage() {
           stock: product.stock || 1,
           attributes: product.attributes || {},
           is_safe_deal_enabled: product.is_safe_deal_enabled !== undefined ? product.is_safe_deal_enabled : true,
-          priceType: product.is_free ? 'free' : product.is_exchange ? 'exchange' : 'price',
+          priceType,
           isNegotiable: product.is_negotiable || false,
           existingImages: product.images || []
         });

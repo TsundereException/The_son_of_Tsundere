@@ -30,22 +30,25 @@ export default function FavoritesPage() {
     );
   }
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center gap-3 mb-8">
-        <Heart className="w-8 h-8 text-red-500 fill-current" />
-        <h1 className="text-3xl font-bold text-gray-900">Моє вибране</h1>
-      </div>
-
-      {isLoading ? (
+  const renderContent = () => {
+    if (isLoading) {
+      return (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
-      ) : error ? (
+      );
+    }
+    
+    if (error) {
+      return (
         <div className="text-center py-20 bg-red-50 rounded-xl">
           <p className="text-red-600 font-medium">Помилка завантаження. Спробуйте пізніше.</p>
         </div>
-      ) : !favorites || favorites.length === 0 ? (
+      );
+    }
+
+    if (!favorites || favorites.length === 0) {
+      return (
         <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
           <Heart className="w-16 h-16 text-gray-200 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Тут поки що порожньо</h2>
@@ -54,13 +57,26 @@ export default function FavoritesPage() {
             Перейти в каталог
           </Link>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {favorites.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {favorites.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-center gap-3 mb-8">
+        <Heart className="w-8 h-8 text-red-500 fill-current" />
+        <h1 className="text-3xl font-bold text-gray-900">Моє вибране</h1>
+      </div>
+
+      {renderContent()}
     </div>
   );
 }

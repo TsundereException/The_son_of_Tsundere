@@ -1,4 +1,4 @@
-import { Users, Code, Bug, GraduationCap, Map, Target, Zap } from 'lucide-react';
+import { Code, Bug, GraduationCap, Map, Target, Zap } from 'lucide-react';
 
 export default function AboutUsPage() {
   return (

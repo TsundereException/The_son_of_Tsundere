@@ -177,9 +177,9 @@ export default function AuthPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" onClick={async (e) => { e.preventDefault(); await showAlert('Функція відновлення пароля в розробці'); }} className="font-medium text-indigo-600 hover:text-indigo-500">
+                <button type="button" onClick={async () => await showAlert('Функція відновлення пароля в розробці')} className="font-medium text-indigo-600 hover:text-indigo-500">
                   Забули пароль?
-                </a>
+                </button>
               </div>
             </div>
           )}

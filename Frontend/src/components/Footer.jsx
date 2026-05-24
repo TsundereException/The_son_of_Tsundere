@@ -17,18 +17,18 @@ export default function Footer() {
               Знайди те, що шукаєш, або продай непотрібне швидко та безпечно.
             </p>
             <div className="flex space-x-6 mt-6">
-              <a href="#" onClick={async (e) => { e.preventDefault(); await showAlert('Функція в розробці'); }} className="text-gray-400 hover:text-gray-500">
+              <button onClick={async () => await showAlert('Функція в розробці')} className="text-gray-400 hover:text-gray-500">
                 <span className="sr-only">Email</span>
                 <Mail className="h-6 w-6" />
-              </a>
-              <a href="#" onClick={async (e) => { e.preventDefault(); await showAlert('Функція в розробці'); }} className="text-gray-400 hover:text-gray-500">
+              </button>
+              <button onClick={async () => await showAlert('Функція в розробці')} className="text-gray-400 hover:text-gray-500">
                 <span className="sr-only">Phone</span>
                 <Phone className="h-6 w-6" />
-              </a>
-              <a href="#" onClick={async (e) => { e.preventDefault(); await showAlert('Функція в розробці'); }} className="text-gray-400 hover:text-gray-500">
+              </button>
+              <button onClick={async () => await showAlert('Функція в розробці')} className="text-gray-400 hover:text-gray-500">
                 <span className="sr-only">Website</span>
                 <Globe className="h-6 w-6" />
-              </a>
+              </button>
             </div>
           </div>
           
@@ -44,7 +44,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Підтримка</h3>
             <ul className="mt-4 space-y-4">
-              <li><a href="#" onClick={async (e) => { e.preventDefault(); await showAlert('Сторінка в розробці'); }} className="text-base text-gray-500 hover:text-gray-900">Контакти</a></li>
+              <li><button onClick={async () => await showAlert('Сторінка в розробці')} className="text-base text-gray-500 hover:text-gray-900">Контакти</button></li>
               <li><Link to="/faq" className="text-base text-gray-500 hover:text-gray-900">FAQ / Допомога</Link></li>
               <li><Link to="/safety" className="text-base text-gray-500 hover:text-gray-900">Правила безпеки</Link></li>
             </ul>

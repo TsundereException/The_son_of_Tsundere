@@ -7,6 +7,22 @@ import { getDistanceText } from '../utils/distance';
 import apiClient from '../api/client';
 import PropTypes from 'prop-types';
 
+const HeartButton = ({ isFavorite, toggleFavorite }) => (
+  <button
+    onClick={toggleFavorite}
+    className={`absolute top-2 right-2 p-2 rounded-full shadow-sm transition-colors z-10 ${
+      isFavorite ? 'bg-white text-red-500' : 'bg-white/80 text-gray-500 hover:text-red-500 hover:bg-white'
+    }`}
+  >
+    <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+  </button>
+);
+
+HeartButton.propTypes = {
+  isFavorite: PropTypes.bool.isRequired,
+  toggleFavorite: PropTypes.func.isRequired,
+};
+
 export default function ProductCard({ product, layout = 'grid' }) {
   const { user } = useAuth();
   const { updateFavoritesCount } = useFavorites();
@@ -46,17 +62,6 @@ export default function ProductCard({ product, layout = 'grid' }) {
     }
   };
 
-  const HeartButton = () => (
-    <button
-      onClick={toggleFavorite}
-      className={`absolute top-2 right-2 p-2 rounded-full shadow-sm transition-colors z-10 ${
-        isFavorite ? 'bg-white text-red-500' : 'bg-white/80 text-gray-500 hover:text-red-500 hover:bg-white'
-      }`}
-    >
-      <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-    </button>
-  );
-
   if (layout === 'list') {
     return (
       <Link to={`/product/${idOrSlug}`} className="group block mb-4 relative">
@@ -72,7 +77,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
                 Нове
               </span>
             )}
-            <HeartButton />
+            <HeartButton isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
           </div>
           <div className="p-4 sm:p-6 flex flex-col flex-1 justify-between">
             <div>
@@ -117,7 +122,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
               Нове
             </span>
           )}
-          <HeartButton />
+          <HeartButton isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
         </div>
         <div className="p-4">
           <h3 className="text-lg font-medium text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">

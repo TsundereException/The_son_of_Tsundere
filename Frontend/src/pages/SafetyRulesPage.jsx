@@ -56,10 +56,10 @@ export default function SafetyRulesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {SAFETY_RULES.map((rule, idx) => {
+          {SAFETY_RULES.map((rule) => {
             const Icon = rule.icon;
             return (
-              <div key={idx} className="bg-gray-50 rounded-2xl p-8 hover:shadow-md transition-shadow border border-gray-100">
+              <div key={rule.title} className="bg-gray-50 rounded-2xl p-8 hover:shadow-md transition-shadow border border-gray-100">
                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${rule.color}`}>
                   <Icon className="w-7 h-7" />
                 </div>

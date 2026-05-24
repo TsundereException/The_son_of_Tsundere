@@ -32,6 +32,16 @@ const formatMessageTime = (dateString, fullFormat = false) => {
   return fullFormat ? `${dateStr} ${timeStr}` : dateStr;
 };
 
+const getMessageClass = (msg, isMe) => {
+  if (msg.is_deleted) {
+    return 'bg-gray-50 text-gray-400 italic border border-gray-100';
+  }
+  if (isMe) {
+    return 'bg-indigo-600 text-white';
+  }
+  return 'bg-gray-100 text-gray-900';
+};
+
 export default function ChatPage() {
   const { sellerId } = useParams();
   const { user } = useAuth();
@@ -93,7 +103,7 @@ export default function ChatPage() {
           setMessages(data.messages);
         }
         setConversations(prev => {
-          if (!prev.find(c => c.id === data.id)) return [data, ...prev];
+          if (!prev.some(c => c.id === data.id)) return [data, ...prev];
           return prev;
         });
       } catch (e) {
@@ -186,10 +196,11 @@ export default function ChatPage() {
             conversations.map(conv => {
               const otherUser = conv.participants.find(p => p.id !== user.id) || conv.participants[0];
               return (
-                <div 
+                <button
+                  type="button"
                   key={conv.id} 
                   onClick={() => { setActiveConv(conv); setMessages(conv.messages || []); navigate('/chat', {replace: true}); setEditingMessage(null); setNewMessage(''); }}
-                  className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors flex items-center gap-3 ${activeConv?.id === conv.id ? 'bg-indigo-50 border-indigo-100' : ''}`}
+                  className={`w-full text-left p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors flex items-center gap-3 ${activeConv?.id === conv.id ? 'bg-indigo-50 border-indigo-100' : ''}`}
                 >
                   <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold uppercase shrink-0">
                     {otherUser?.first_name ? otherUser.first_name[0] : (otherUser?.username?.[0] || 'U')}
@@ -220,7 +231,7 @@ export default function ChatPage() {
                       )}
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })
           )}
@@ -265,7 +276,7 @@ export default function ChatPage() {
                               </button>
                             </div>
                           )}
-                          <div className={`max-w-[70%] rounded-2xl px-4 py-2 ${msg.is_deleted ? 'bg-gray-50 text-gray-400 italic border border-gray-100' : (isMe ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900')} ${isMe ? 'rounded-br-none' : 'rounded-bl-none'}`}>
+                          <div className={`max-w-[70%] rounded-2xl px-4 py-2 ${getMessageClass(msg, isMe)} ${isMe ? 'rounded-br-none' : 'rounded-bl-none'}`}>
                             {msg.is_deleted ? "Повідомлення видалено" : msg.text}
                           </div>
                         </div>
