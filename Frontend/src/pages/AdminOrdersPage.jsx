@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { Eye, Edit2 } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert, showPrompt } = useModal();
 
   const fetchOrders = async () => {
     try {
@@ -35,7 +37,7 @@ export default function AdminOrdersPage() {
       cancelled: 'Скасовано',
     };
     const statusOptions = statuses.map((s, i) => `${i + 1}. ${statusMap[s]}`).join('\n');
-    const choice = window.prompt(`Оберіть новий статус (введіть номер):\n${statusOptions}`);
+    const choice = await showPrompt(`Оберіть новий статус (введіть номер):\n${statusOptions}`);
     
     if (choice && statuses[choice - 1]) {
       const newStatus = statuses[choice - 1];
@@ -44,7 +46,7 @@ export default function AdminOrdersPage() {
         fetchOrders();
       } catch (error) {
         console.error('Failed to update status:', error);
-        window.alert('Помилка при оновленні статусу');
+        await showAlert('Помилка при оновленні статусу');
       }
     }
   };

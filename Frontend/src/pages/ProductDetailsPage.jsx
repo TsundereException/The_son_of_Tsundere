@@ -4,19 +4,24 @@ import apiClient from '../api/client';
 import ProductTabs from '../components/ProductTabs';
 import RelatedProducts from '../components/RelatedProducts';
 import { useAuth } from '../context/AuthContext';
+import { useFavorites } from '../context/FavoritesContext';
 import { getDistanceText } from '../utils/distance';
 import { useNavigate, Link } from 'react-router-dom';
-
+import { Heart } from 'lucide-react';
 import CheckoutModal from '../components/CheckoutModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useModal } from '../context/ModalContext';
 
 export default function ProductDetailsPage() {
   const { id } = useParams(); // actually slug based on routing /product/:id
   const { user } = useAuth();
+  const { updateFavoritesCount } = useFavorites();
   const navigate = useNavigate();
+  const { showAlert } = useModal();
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [checkoutMode, setCheckoutMode] = useState(false); // true if safe deal
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
@@ -25,6 +30,31 @@ export default function ProductDetailsPage() {
       return response.data;
     },
   });
+
+  useEffect(() => {
+    if (product) {
+      setIsFavorite(product.is_favorite || false);
+    }
+  }, [product]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    const newStatus = !isFavorite;
+    setIsFavorite(newStatus);
+    updateFavoritesCount(newStatus ? 1 : -1);
+
+    try {
+      await apiClient.post(`/products/${product.id}/favorite/`);
+    } catch (error) {
+      setIsFavorite(!newStatus);
+      updateFavoritesCount(!newStatus ? 1 : -1);
+      console.error('Failed to toggle favorite', error);
+    }
+  };
 
   // Fetch related products (same category, exclude current)
   const categoryId = product?.category?.id;
@@ -39,9 +69,21 @@ export default function ProductDetailsPage() {
     enabled: !!categoryId,
   });
 
-  const handleBuyClick = (isSafe) => {
+  // Fetch filters config to map attribute slugs to human-readable names
+  const { data: config } = useQuery({
+    queryKey: ['filters-config', categoryId],
+    queryFn: async () => {
+      const response = await apiClient.get('/products/filters-config/', {
+        params: { category: categoryId }
+      });
+      return response.data;
+    },
+    enabled: !!categoryId,
+  });
+
+  const handleBuyClick = async (isSafe) => {
     if (!user) {
-      window.alert('Будь ласка, авторизуйтесь для здійснення покупки');
+      await showAlert('Будь ласка, авторизуйтесь для здійснення покупки');
       navigate('/auth');
       return;
     }
@@ -66,13 +108,39 @@ export default function ProductDetailsPage() {
     );
   }
 
+  // Map attributes using config
+  let mappedAttributes = {};
+  let condition = null;
+
+  if (product.attributes && typeof product.attributes === 'object') {
+    Object.entries(product.attributes).forEach(([slug, val]) => {
+      let attrName = slug;
+      let attrValue = Array.isArray(val) ? val.join(', ') : val;
+
+      if (config?.attributes) {
+        const foundAttr = config.attributes.find(a => a.slug === slug);
+        if (foundAttr) {
+          attrName = foundAttr.name;
+        }
+      }
+
+      // Check if it's condition
+      if (slug.toLowerCase() === 'stan' || slug.toLowerCase() === 'condition' || attrName.toLowerCase() === 'стан') {
+        condition = attrValue;
+      }
+
+      if (attrValue && attrValue !== '') {
+        mappedAttributes[attrName] = attrValue;
+      }
+    });
+  }
+
   // Мапінг полів
   const title = product.name;
   const price = product.price;
   const description = product.description;
   const location = product.city || 'Онлайн';
   const locationDisplay = getDistanceText(user?.city, location);
-  const condition = product.attributes?.condition || 'Нове';
   const date = new Date(product.created_at).toLocaleString();
   const sellerName = product.seller?.first_name || product.seller?.username || 'Користувач';
   const sellerRating = product.avg_rating || 0;
@@ -131,12 +199,25 @@ export default function ProductDetailsPage() {
         {/* Right Column: Key Info & Actions */}
         <div className="space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full mb-4">
-              {condition}
-            </div>
+            {condition && (
+              <div className="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full mb-4">
+                {condition}
+              </div>
+            )}
             <h1 className="text-2xl font-bold text-gray-900 mb-4">{title}</h1>
-            <div className="text-4xl font-extrabold text-indigo-600 mb-6">
-              {price} ₴
+            <div className="flex items-center gap-4 mb-6">
+              <div className="text-4xl font-extrabold text-indigo-600">
+                {price} ₴
+              </div>
+              <button 
+                onClick={toggleFavorite}
+                className={`p-3 rounded-full border-2 transition-colors flex items-center justify-center ${
+                  isFavorite ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200'
+                }`}
+                title={isFavorite ? "Видалити з вибраного" : "Додати у вибране"}
+              >
+                <Heart className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} />
+              </button>
             </div>
             {product.is_safe_deal_enabled ? (
               <div className="flex flex-col gap-3 mb-3">
@@ -154,12 +235,12 @@ export default function ProductDetailsPage() {
               </button>
             )}
             <button 
-              onClick={() => {
+              onClick={async () => {
                 if (!user) {
-                  window.alert('Спершу авторизуйтесь!');
+                  await showAlert('Спершу авторизуйтесь!');
                   navigate('/auth');
                 } else {
-                  navigate(`/chat/${product.seller?.id}`);
+                  navigate(`/chat/${product.seller?.id}?product=${product.id}`);
                 }
               }}
               className="w-full bg-indigo-50 text-indigo-600 font-bold py-3 rounded-xl hover:bg-indigo-100 transition-colors flex items-center justify-center">
@@ -199,7 +280,7 @@ export default function ProductDetailsPage() {
       </div>
 
       {/* Tabs / Detailed specs */}
-      <ProductTabs description={description} attributes={product.attributes} />
+      <ProductTabs description={description} attributes={mappedAttributes} />
 
       {/* Related Products */}
       <RelatedProducts products={relatedProducts} isLoading={isLoadingRelated} />

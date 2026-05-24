@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { Trash2, Edit2, Plus } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategorySlug, setNewCategorySlug] = useState('');
+  const { showAlert, showConfirm, showPrompt } = useModal();
 
   const fetchCategories = async () => {
     try {
@@ -37,26 +39,27 @@ export default function AdminCategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Failed to add category:', error);
-      window.alert('Помилка при створенні категорії (можливо такий slug вже існує)');
+      await showAlert('Помилка при створенні категорії (можливо такий slug вже існує)');
     }
   };
 
   const deleteCategory = async (id) => {
-    if (window.confirm('Видалити категорію? Усі товари в ній можуть залишитись без категорії.')) {
+    const confirmed = await showConfirm('Видалити категорію? Усі товари в ній можуть залишитись без категорії.');
+    if (confirmed) {
       try {
         await apiClient.delete(`/auth/admin/categories/${id}/`);
         fetchCategories();
       } catch (error) {
         console.error('Failed to delete category:', error);
-        window.alert('Не вдалося видалити категорію');
+        await showAlert('Не вдалося видалити категорію');
       }
     }
   };
 
   const editCategory = async (id, currentName, currentSlug) => {
-    const newName = window.prompt('Нова назва категорії:', currentName);
+    const newName = await showPrompt('Нова назва категорії:', currentName);
     if (!newName) return;
-    const newSlug = window.prompt('Новий slug (url-назва, англійською без пробілів):', currentSlug);
+    const newSlug = await showPrompt('Новий slug (url-назва, англійською без пробілів):', currentSlug);
     if (!newSlug) return;
 
     try {
@@ -67,7 +70,7 @@ export default function AdminCategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Failed to update category:', error);
-      window.alert('Не вдалося оновити категорію');
+      await showAlert('Не вдалося оновити категорію');
     }
   };
 

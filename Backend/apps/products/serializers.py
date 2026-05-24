@@ -82,11 +82,12 @@ class ProductListSerializer(serializers.ModelSerializer):
     seller     = serializers.StringRelatedField()
     category   = CategorySerializer(read_only=True)
     distance   = serializers.SerializerMethodField()
+    is_favorite= serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'price', 'is_negotiable', 'is_free', 'is_exchange', 'stock',
-                  'main_image', 'avg_rating', 'seller', 'category', 'city', 'distance']
+                  'main_image', 'avg_rating', 'seller', 'category', 'city', 'distance', 'is_favorite']
 
     def get_main_image(self, obj):
         request = self.context.get('request')
@@ -101,6 +102,15 @@ class ProductListSerializer(serializers.ModelSerializer):
             return haversine_distance(request.user.city, obj.city)
         return None
 
+    def get_is_favorite(self, obj):
+        if hasattr(obj, 'is_favorite_annotated'):
+            return obj.is_favorite_annotated
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # Не оптимізований варіант (фолбек)
+            return obj.favorited_by.filter(user=request.user).exists()
+        return False
+
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     """Повний варіант для сторінки товару"""
@@ -113,12 +123,13 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(), source='category', write_only=True
     )
     distance   = serializers.SerializerMethodField()
+    is_favorite= serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'description', 'attributes', 'price', 'is_negotiable', 'is_free', 'is_exchange', 'stock',
                   'is_active', 'seller', 'category', 'category_id',
-                  'images', 'reviews', 'avg_rating', 'created_at', 'updated_at', 'city', 'distance']
+                  'images', 'reviews', 'avg_rating', 'created_at', 'updated_at', 'city', 'distance', 'is_favorite']
         read_only_fields = ['id', 'seller', 'slug', 'created_at', 'updated_at']
 
     def get_distance(self, obj):
@@ -126,6 +137,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated and request.user.city and obj.city:
             return haversine_distance(request.user.city, obj.city)
         return None
+
+    def get_is_favorite(self, obj):
+        if hasattr(obj, 'is_favorite_annotated'):
+            return obj.is_favorite_annotated
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.favorited_by.filter(user=request.user).exists()
+        return False
 
     def create(self, validated_data):
         validated_data['seller'] = self.context['request'].user

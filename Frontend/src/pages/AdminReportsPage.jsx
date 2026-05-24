@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert, showConfirm } = useModal();
 
   const fetchReports = async () => {
     try {
@@ -22,13 +24,14 @@ export default function AdminReportsPage() {
   }, []);
 
   const changeStatus = async (id, newStatus) => {
-    if (window.confirm('Ви впевнені, що хочете змінити статус скарги?')) {
+    const confirmed = await showConfirm('Ви впевнені, що хочете змінити статус скарги?');
+    if (confirmed) {
       try {
         await apiClient.patch(`/auth/admin/reports/${id}/`, { status: newStatus });
         fetchReports();
       } catch (error) {
         console.error('Failed to update report status:', error);
-        window.alert('Помилка при оновленні статусу');
+        await showAlert('Помилка при оновленні статусу');
       }
     }
   };

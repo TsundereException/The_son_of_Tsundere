@@ -106,3 +106,34 @@ class UnreadCountView(APIView):
         ).exclude(sender=request.user).count()
         
         return Response({'unread_count': count})
+
+
+class MessageDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        return get_object_or_404(Message, pk=pk, sender=user)
+
+    def patch(self, request, pk):
+        message = self.get_object(pk, request.user)
+        if message.is_deleted:
+            return Response({'error': 'Cannot edit deleted message'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        serializer = SendMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            message.text = serializer.validated_data['text']
+            message.is_edited = True
+            message.save()
+            
+            message.conversation.save()
+            return Response(ConversationDetailSerializer(message.conversation, context={'request': request}).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        message = self.get_object(pk, request.user)
+        if not message.is_deleted:
+            message.is_deleted = True
+            message.save()
+            message.conversation.save()
+        
+        return Response(ConversationDetailSerializer(message.conversation, context={'request': request}).data, status=status.HTTP_200_OK)
