@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { Trash2, Star } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert, showConfirm } = useModal();
 
   const fetchReviews = async () => {
     try {
@@ -22,13 +24,14 @@ export default function AdminReviewsPage() {
   }, []);
 
   const deleteReview = async (id) => {
-    if (window.confirm('Ви впевнені, що хочете видалити цей відгук? Дія незворотня.')) {
+    const confirmed = await showConfirm('Ви впевнені, що хочете видалити цей відгук? Дія незворотня.');
+    if (confirmed) {
       try {
         await apiClient.delete(`/auth/admin/reviews/${id}/`);
         fetchReviews();
       } catch (error) {
         console.error('Failed to delete review:', error);
-        window.alert('Помилка при видаленні відгуку');
+        await showAlert('Помилка при видаленні відгуку');
       }
     }
   };

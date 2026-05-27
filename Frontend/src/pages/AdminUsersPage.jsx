@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { User, Shield, ShieldOff, CheckCircle, XCircle } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert } = useModal();
 
   const fetchUsers = async () => {
     try {
@@ -29,7 +31,7 @@ export default function AdminUsersPage() {
       fetchUsers(); // reload
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      window.alert('Не вдалося змінити статус користувача');
+      await showAlert('Не вдалося змінити статус користувача');
     }
   };
 
@@ -42,7 +44,7 @@ export default function AdminUsersPage() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to change role:', error);
-      window.alert('Не вдалося змінити роль користувача');
+      await showAlert('Не вдалося змінити роль користувача');
     }
   };
 

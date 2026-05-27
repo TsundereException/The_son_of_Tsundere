@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import { useModal } from '../context/ModalContext';
 
 export default function AdminListingsPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showAlert, showConfirm } = useModal();
 
   const fetchListings = async () => {
     try {
@@ -27,18 +29,19 @@ export default function AdminListingsPage() {
       fetchListings();
     } catch (error) {
       console.error('Failed to toggle status:', error);
-      window.alert('Не вдалося змінити статус оголошення');
+      await showAlert('Не вдалося змінити статус оголошення');
     }
   };
 
   const deleteListing = async (id) => {
-    if (window.confirm('Ви впевнені, що хочете назавжди видалити це оголошення?')) {
+    const confirmed = await showConfirm('Ви впевнені, що хочете назавжди видалити це оголошення?');
+    if (confirmed) {
       try {
         await apiClient.delete(`/auth/admin/products/${id}/`);
         fetchListings();
       } catch (error) {
         console.error('Failed to delete listing:', error);
-        window.alert('Не вдалося видалити оголошення');
+        await showAlert('Не вдалося видалити оголошення');
       }
     }
   };

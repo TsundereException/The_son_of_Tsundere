@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import apiClient from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 import { CITIES_LIST } from '../utils/distance';
 
@@ -11,6 +12,7 @@ export default function UserProfilePage() {
   const [activeTab, setActiveTab] = useState('listings');
   const [city, setCity] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const { showAlert } = useModal();
   
   const [myListings, setMyListings] = useState([]);
   const [isLoadingListings, setIsLoadingListings] = useState(false);
@@ -104,7 +106,7 @@ export default function UserProfilePage() {
       setActiveTab('listings');
       setTimeout(() => setActiveTab('sales'), 0);
     } catch (e) {
-      globalThis.alert(e.response?.data?.detail || 'Помилка');
+      await showAlert(e.response?.data?.detail || 'Помилка');
     }
   };
 
@@ -327,9 +329,9 @@ export default function UserProfilePage() {
                   setIsUpdating(true);
                   try {
                     await updateProfile({ city });
-                    globalThis.alert('Профіль оновлено!');
+                    await showAlert('Профіль оновлено!');
                   } catch (e) {
-                    globalThis.alert('Помилка оновлення');
+                    await showAlert('Помилка оновлення');
                   } finally {
                     setIsUpdating(false);
                   }

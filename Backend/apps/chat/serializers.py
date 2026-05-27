@@ -8,7 +8,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'text', 'is_read', 'created_at']
+        fields = ['id', 'sender', 'text', 'is_read', 'is_edited', 'is_deleted', 'created_at']
 
 
 class ConversationListSerializer(serializers.ModelSerializer):
@@ -25,9 +25,10 @@ class ConversationListSerializer(serializers.ModelSerializer):
         last_msg = obj.messages.last()
         if last_msg:
             return {
-                'text': last_msg.text,
+                'text': "Повідомлення видалено" if last_msg.is_deleted else last_msg.text,
                 'sender': last_msg.sender.username,
-                'created_at': last_msg.created_at
+                'created_at': last_msg.created_at,
+                'is_deleted': last_msg.is_deleted
             }
         return None
 

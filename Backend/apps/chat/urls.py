@@ -4,7 +4,8 @@ from .views import (
     StartConversationView,
     ConversationDetailView,
     SendMessageView,
-    UnreadCountView
+    UnreadCountView,
+    MessageDetailView
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('unread-count/', UnreadCountView.as_view(), name='unread-count'),
     path('<int:pk>/', ConversationDetailView.as_view(), name='conversation-detail'),
     path('<int:pk>/messages/', SendMessageView.as_view(), name='send-message'),
+    path('messages/<int:pk>/', MessageDetailView.as_view(), name='message-detail'),
 ]

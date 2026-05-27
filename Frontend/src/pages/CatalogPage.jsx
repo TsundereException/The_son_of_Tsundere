@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'react-router-dom';
 import apiClient from '../api/client';
 import CatalogFilters from '../components/CatalogFilters';
 import ProductCard from '../components/ProductCard';
@@ -10,11 +11,29 @@ export default function CatalogPage() {
   const [ordering, setOrdering] = useState('-created_at'); // За замовчуванням новизна
   const [filters, setFilters] = useState({});
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search') || '';
+  const cityQuery = searchParams.get('city') || '';
+
+  // Скидаємо сторінку при зміні пошукового запиту
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, cityQuery]);
+
   // Генеруємо параметри для запиту з урахуванням динамічних фільтрів
   const queryParams = {
     page: currentPage,
     ordering: ordering,
   };
+  
+  if (searchQuery) {
+    queryParams.search = searchQuery;
+  }
+  
+  if (cityQuery) {
+    queryParams.city = cityQuery;
+  }
   
   if (filters.subcategory) {
     queryParams.category = filters.subcategory;
@@ -41,7 +60,7 @@ export default function CatalogPage() {
   }
 
   const { data: productsData, isLoading, error } = useQuery({
-    queryKey: ['products', currentPage, ordering, filters],
+    queryKey: ['products', currentPage, ordering, filters, searchQuery, cityQuery],
     queryFn: async () => {
       const response = await apiClient.get('/products/', { params: queryParams });
       return response.data;

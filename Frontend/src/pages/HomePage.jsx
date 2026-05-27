@@ -7,13 +7,6 @@ import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
 
 
-const MOCK_PRODUCTS = [
-  { id: 1, title: 'MacBook Pro M2 2023', price: '45000', location: 'Київ', date: 'Сьогодні', condition: 'New', imageUrl: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=600' },
-  { id: 2, title: 'PlayStation 5', price: '18500', location: 'Львів', date: 'Вчора', condition: 'Used', imageUrl: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=600' },
-  { id: 3, title: 'Офісне крісло', price: '2500', location: 'Одеса', date: 'Сьогодні', condition: 'Used', imageUrl: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&q=80&w=600' },
-  { id: 4, title: 'iPhone 15 Pro Max', price: '52000', location: 'Дніпро', date: '2 дні тому', condition: 'New', imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=600' },
-];
-
 // Helper to get icon by name
 const getIconComponent = (iconName) => {
   if (!iconName) return LucideIcons.Folder;
@@ -42,6 +35,19 @@ export default function HomePage() {
       setActiveCategory(category);
     }
   };
+
+  // Fetch latest products from API
+  const { data: latestProductsData, isLoading: isLoadingLatest } = useQuery({
+    queryKey: ['latest_products'],
+    queryFn: async () => {
+      const response = await apiClient.get('/products/', {
+        params: { ordering: '-created_at', limit: 4 }
+      });
+      return response.data.results || response.data;
+    },
+  });
+
+  const latestProducts = latestProductsData?.slice(0, 4) || [];
 
   return (
     <div className="space-y-12">
@@ -139,19 +145,32 @@ export default function HomePage() {
       <section>
         <div className="flex justify-between items-end mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Нові оголошення</h2>
-          <a href="/catalog" className="text-indigo-600 hover:text-indigo-700 font-medium hidden sm:block">
+          <Link to="/catalog" className="text-indigo-600 hover:text-indigo-700 font-medium hidden sm:block">
             Дивитись усі &rarr;
-          </a>
+          </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {MOCK_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        
+        {isLoadingLatest ? (
+          <div className="flex justify-center py-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {latestProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+            {latestProducts.length === 0 && (
+              <div className="col-span-full text-center text-gray-500 py-8">
+                Оголошень ще немає. Будьте першим!
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="mt-6 text-center sm:hidden">
-          <a href="/catalog" className="text-indigo-600 hover:text-indigo-700 font-medium">
+          <Link to="/catalog" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Дивитись усі &rarr;
-          </a>
+          </Link>
         </div>
       </section>
     </div>

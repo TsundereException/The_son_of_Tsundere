@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { X, CreditCard, MapPin, Truck } from 'lucide-react';
 import apiClient from '../api/client';
 import { useNavigate } from 'react-router-dom';
+import { useModal } from '../context/ModalContext';
 
 export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) {
   const navigate = useNavigate();
+  const { showAlert } = useModal();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     delivery_provider: 'nova_poshta',
@@ -37,10 +39,10 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
         payload.delivery_provider = formData.delivery_provider;
         payload.card_number = formData.card_number;
         await apiClient.post('/orders/safe-buy/', payload);
-        globalThis.alert('Безпечну угоду оформлено успішно! Гроші зарезервовані.');
+        await showAlert('Безпечну угоду оформлено успішно! Гроші зарезервовані.');
       } else {
         await apiClient.post('/orders/create/', payload);
-        globalThis.alert('Замовлення оформлено!');
+        await showAlert('Замовлення оформлено!');
       }
 
       onClose();

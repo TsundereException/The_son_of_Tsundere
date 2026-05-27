@@ -21,6 +21,8 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', verbose_name='Відправник')
     text = models.TextField(verbose_name='Текст')
     is_read = models.BooleanField(default=False, verbose_name='Прочитано')
+    is_edited = models.BooleanField(default=False, verbose_name='Відредаговано')
+    is_deleted = models.BooleanField(default=False, verbose_name='Видалено')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
