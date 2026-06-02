@@ -45,4 +45,4 @@ class ConversationDetailSerializer(ConversationListSerializer):
 
 
 class SendMessageSerializer(serializers.Serializer):
-    text = serializers.CharField()
+    text = serializers.CharField(trim_whitespace=True, min_length=1, max_length=2000)

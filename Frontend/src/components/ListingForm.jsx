@@ -39,6 +39,7 @@ export default function ListingForm({
   const [imagesToDelete, setImagesToDelete] = useState([]);
   const [images, setImages] = useState([]); // array of File objects
   const [imagePreviews, setImagePreviews] = useState([]); // array of URL strings
+  const [clientError, setClientError] = useState('');
 
   // Load initial data if provided
   useEffect(() => {
@@ -96,8 +97,24 @@ export default function ListingForm({
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    // Filter out non-images just in case
-    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    const availableSlots = 10 - existingImages.length - imagePreviews.length;
+    const acceptedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validFiles = files.slice(0, availableSlots).filter(file => {
+      if (!acceptedTypes.includes(file.type)) {
+        setClientError('Дозволені тільки JPEG, PNG, WEBP або GIF');
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setClientError('Фото має бути не більше 5MB');
+        return false;
+      }
+      return true;
+    });
+
+    if (files.length > availableSlots) {
+      setClientError('Максимальна кількість фотографій - 10');
+    }
+    if (!validFiles.length) return;
     
     setImages(prev => [...prev, ...validFiles]);
 
@@ -121,8 +138,40 @@ export default function ListingForm({
 
   const handleSubmitInternal = (e) => {
     e.preventDefault();
+    setClientError('');
+
+    const normalized = {
+      ...formData,
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      city: formData.city.trim(),
+    };
+
+    if (normalized.name.length < 3) {
+      setClientError('Назва має містити щонайменше 3 символи');
+      return;
+    }
+    if (!normalized.category_id) {
+      setClientError('Оберіть категорію');
+      return;
+    }
+    if (normalized.description.length < 10) {
+      setClientError('Опис має містити щонайменше 10 символів');
+      return;
+    }
+    if (priceType === 'price') {
+      const parsedPrice = Number(normalized.price);
+      if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+        setClientError('Вкажіть коректну ціну');
+        return;
+      }
+      normalized.price = parsedPrice;
+    } else {
+      normalized.price = 0;
+    }
+
     onSubmit({
-      formData,
+      formData: normalized,
       priceType,
       isNegotiable,
       images,
@@ -148,9 +197,9 @@ export default function ListingForm({
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <form onSubmit={handleSubmitInternal} className="p-6 sm:p-8">
           
-          {error && (
+          {(error || clientError) && (
             <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r">
-              <p>{error}</p>
+              <p>{error || clientError}</p>
             </div>
           )}
 
@@ -359,7 +408,7 @@ export default function ListingForm({
                 }));
               };
 
-              let inputElement = null;
+              let inputElement;
 
               if (attr.type === 'range') {
                 inputElement = (

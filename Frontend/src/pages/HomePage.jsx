@@ -20,7 +20,7 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState(null);
 
   // Fetch categories from API
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData, isLoading: isLoadingCategories, error: categoriesError } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
       const response = await apiClient.get('/products/categories/');
@@ -29,6 +29,11 @@ export default function HomePage() {
   });
 
   const handleCategoryClick = (category) => {
+    if (!category.children || category.children.length === 0) {
+      navigate(`/catalog?category=${category.id}`);
+      return;
+    }
+
     if (activeCategory?.id === category.id) {
       setActiveCategory(null); // toggle off
     } else {
@@ -37,7 +42,7 @@ export default function HomePage() {
   };
 
   // Fetch latest products from API
-  const { data: latestProductsData, isLoading: isLoadingLatest } = useQuery({
+  const { data: latestProductsData, isLoading: isLoadingLatest, error: latestProductsError } = useQuery({
     queryKey: ['latest_products'],
     queryFn: async () => {
       const response = await apiClient.get('/products/', {
@@ -85,8 +90,17 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Розділи на сервісі</h2>
         
         {/* Horizontal row of categories */}
-        <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
-          {categoriesData?.map((category) => {
+        {isLoadingCategories ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : categoriesError ? (
+          <div className="text-center py-8 bg-red-50 border border-red-100 text-red-700 rounded-xl">
+            Не вдалося завантажити категорії. Перевірте підключення до сервера.
+          </div>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
+            {categoriesData?.map((category) => {
             const Icon = getIconComponent(category.icon_name);
             const colorClass = category.color || 'bg-gray-100 text-gray-600';
             const isActive = activeCategory?.id === category.id;
@@ -105,8 +119,9 @@ export default function HomePage() {
                 </span>
               </div>
             );
-          })}
-        </div>
+            })}
+          </div>
+        )}
 
         {/* Expanded Subcategories Panel */}
         {activeCategory && (
@@ -153,6 +168,10 @@ export default function HomePage() {
         {isLoadingLatest ? (
           <div className="flex justify-center py-10">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : latestProductsError ? (
+          <div className="col-span-full text-center text-red-700 bg-red-50 border border-red-100 rounded-xl py-8">
+            Не вдалося завантажити нові оголошення. Перевірте підключення до сервера.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

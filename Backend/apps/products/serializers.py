@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from decimal import Decimal, InvalidOperation
 from .models import Category, Product, ProductImage, Review, FilterOption, FilterAttribute
 from apps.users.serializers import UserSerializer
 from apps.users.cities import haversine_distance
@@ -22,6 +23,25 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'slug', 'parent', 'children', 'icon_name', 'color', 'product_count']
         read_only_fields = ['slug']
+
+    def validate_name(self, value):
+        value = value.strip()
+        if len(value) < 2:
+            raise serializers.ValidationError('Назва категорії занадто коротка')
+        return value
+
+    def validate(self, attrs):
+        parent = attrs.get('parent')
+        instance = self.instance
+        if instance and parent:
+            if parent.pk == instance.pk:
+                raise serializers.ValidationError({'parent': 'Категорія не може бути власним батьком'})
+            current = parent
+            while current:
+                if current.pk == instance.pk:
+                    raise serializers.ValidationError({'parent': 'Категорії не можуть утворювати цикл'})
+                current = current.parent
+        return attrs
 
     def get_children(self, obj):
         kids = obj.children.all()
@@ -128,9 +148,67 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'description', 'attributes', 'price', 'is_negotiable', 'is_free', 'is_exchange', 'stock',
-                  'is_active', 'seller', 'category', 'category_id',
+                  'is_active', 'is_safe_deal_enabled', 'seller', 'category', 'category_id',
                   'images', 'reviews', 'avg_rating', 'created_at', 'updated_at', 'city', 'distance', 'is_favorite']
         read_only_fields = ['id', 'seller', 'slug', 'created_at', 'updated_at']
+
+    def validate_name(self, value):
+        value = value.strip()
+        if len(value) < 3:
+            raise serializers.ValidationError('Назва має містити щонайменше 3 символи')
+        return value
+
+    def validate_description(self, value):
+        value = value.strip()
+        if len(value) < 10:
+            raise serializers.ValidationError('Опис має містити щонайменше 10 символів')
+        if len(value) > 5000:
+            raise serializers.ValidationError('Опис занадто довгий')
+        return value
+
+    def validate_city(self, value):
+        value = (value or '').strip()
+        if len(value) > 50:
+            raise serializers.ValidationError('Назва міста занадто довга')
+        return value
+
+    def validate_attributes(self, value):
+        if not isinstance(value, dict):
+            raise serializers.ValidationError('Характеристики мають бути обʼєктом')
+        if len(value) > 50:
+            raise serializers.ValidationError('Забагато характеристик')
+        for key, attr_value in value.items():
+            if not isinstance(key, str) or not key.replace('_', '').replace('-', '').isalnum():
+                raise serializers.ValidationError('Некоректна назва характеристики')
+            if isinstance(attr_value, list):
+                if len(attr_value) > 20:
+                    raise serializers.ValidationError('Забагато значень характеристики')
+                if any(len(str(v)) > 100 for v in attr_value):
+                    raise serializers.ValidationError('Значення характеристики занадто довге')
+            elif len(str(attr_value)) > 100:
+                raise serializers.ValidationError('Значення характеристики занадто довге')
+        return value
+
+    def validate(self, attrs):
+        is_free = attrs.get('is_free', getattr(self.instance, 'is_free', False))
+        is_exchange = attrs.get('is_exchange', getattr(self.instance, 'is_exchange', False))
+        stock = attrs.get('stock', getattr(self.instance, 'stock', 1))
+        price = attrs.get('price', getattr(self.instance, 'price', Decimal('0')))
+
+        if stock < 0:
+            raise serializers.ValidationError({'stock': 'Кількість не може бути відʼємною'})
+        if is_free and is_exchange:
+            raise serializers.ValidationError({'is_exchange': 'Товар не може бути одночасно безкоштовним і на обмін'})
+        if is_free or is_exchange:
+            attrs['price'] = Decimal('0')
+            attrs['is_negotiable'] = False
+        else:
+            try:
+                if Decimal(price) < 0:
+                    raise serializers.ValidationError({'price': 'Ціна не може бути відʼємною'})
+            except (InvalidOperation, TypeError):
+                raise serializers.ValidationError({'price': 'Некоректна ціна'})
+        return attrs
 
     def get_distance(self, obj):
         request = self.context.get('request')
@@ -160,3 +238,11 @@ class ProductImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'is_main']
+
+    def validate_image(self, value):
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError('Фото має бути не більше 5MB')
+        content_type = getattr(value, 'content_type', '')
+        if content_type and content_type not in ('image/jpeg', 'image/png', 'image/webp', 'image/gif'):
+            raise serializers.ValidationError('Дозволені тільки JPEG, PNG, WEBP або GIF')
+        return value

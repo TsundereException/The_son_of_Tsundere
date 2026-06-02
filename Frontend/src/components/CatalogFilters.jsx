@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, Search, MapPin } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -6,8 +6,7 @@ import apiClient from '../api/client';
 
 export default function CatalogFilters({ onFilterChange }) {
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const initialCategory = queryParams.get('category') || '';
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
   const getInitialFilters = () => {
     const params = new URLSearchParams(location.search);
@@ -50,7 +49,7 @@ export default function CatalogFilters({ onFilterChange }) {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const dropdownRef = useRef(null);
 
-  const { data: config, isLoading, isFetching } = useQuery({
+  const { data: config, isLoading, error } = useQuery({
     queryKey: ['filters-config', localFilters.category],
     queryFn: async () => {
       const response = await apiClient.get('/products/filters-config/', {
@@ -112,6 +111,14 @@ export default function CatalogFilters({ onFilterChange }) {
     return <div className="w-full p-5 animate-pulse bg-gray-100 rounded-xl h-24 mb-6"></div>;
   }
 
+  if (error) {
+    return (
+      <div className="w-full p-5 bg-red-50 border border-red-100 text-red-700 rounded-xl mb-6">
+        Не вдалося завантажити фільтри. Перевірте підключення до сервера.
+      </div>
+    );
+  }
+
   const { categories = [], attributes = [] } = config || {};
 
   // Get active category children if a category is selected
@@ -124,11 +131,6 @@ export default function CatalogFilters({ onFilterChange }) {
 
   const handleCategorySelect = (categoryId) => {
     setLocalFilters(prev => ({ ...prev, category: categoryId, subcategory: '', attributes: {} }));
-    setOpenDropdown(null);
-  };
-
-  const handleSubcategorySelect = (subcategoryId) => {
-    setLocalFilters(prev => ({ ...prev, subcategory: subcategoryId, attributes: {} }));
     setOpenDropdown(null);
   };
 

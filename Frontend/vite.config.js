@@ -9,6 +9,37 @@ import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const testProjects = [{
+  extends: true,
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js'
+  }
+}];
+
+if (process.env.STORYBOOK_TESTS === 'true') {
+  testProjects.push({
+    extends: true,
+    plugins: [
+    // The plugin will run tests for the stories defined in your Storybook config
+    // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+    storybookTest({
+      configDir: path.join(dirname, '.storybook')
+    })],
+    test: {
+      name: 'storybook',
+      browser: {
+        enabled: true,
+        headless: true,
+        provider: playwright({}),
+        instances: [{
+          browser: 'chromium'
+        }]
+      }
+    }
+  });
+}
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
@@ -22,32 +53,6 @@ export default defineConfig({
   },
   plugins: [tailwindcss(), react()],
   test: {
-    projects: [{
-      extends: true,
-      test: {
-        globals: true,
-        environment: 'jsdom',
-        setupFiles: './src/setupTests.js'
-      }
-    }, {
-      extends: true,
-      plugins: [
-      // The plugin will run tests for the stories defined in your Storybook config
-      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-      storybookTest({
-        configDir: path.join(dirname, '.storybook')
-      })],
-      test: {
-        name: 'storybook',
-        browser: {
-          enabled: true,
-          headless: true,
-          provider: playwright({}),
-          instances: [{
-            browser: 'chromium'
-          }]
-        }
-      }
-    }]
+    projects: testProjects
   }
 });

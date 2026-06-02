@@ -1,34 +1,22 @@
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { screen } from '../../test-utils';
+import { renderWithProviders } from '../../test-utils';
 import Footer from '../Footer';
 
 describe('Footer component', () => {
   it('renders Tsundere logo text', () => {
-    render(
-      <BrowserRouter>
-        <Footer />
-      </BrowserRouter>
-    );
+    renderWithProviders(<Footer />);
     expect(screen.getAllByText(/Tsundere/i).length).toBeGreaterThan(0);
   });
 
   it('renders navigation links', () => {
-    render(
-      <BrowserRouter>
-        <Footer />
-      </BrowserRouter>
-    );
+    renderWithProviders(<Footer />);
     expect(screen.getByText('Оголошення')).toBeInTheDocument();
     expect(screen.getByText('Мій профіль')).toBeInTheDocument();
     expect(screen.getByText('Контакти')).toBeInTheDocument();
   });
 
   it('renders copyright info', () => {
-    render(
-      <BrowserRouter>
-        <Footer />
-      </BrowserRouter>
-    );
+    renderWithProviders(<Footer />);
     expect(screen.getByText(/Всі права захищено/i)).toBeInTheDocument();
   });
 });

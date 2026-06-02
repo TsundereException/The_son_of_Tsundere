@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
-import { User, Shield, ShieldOff, CheckCircle, XCircle } from 'lucide-react';
+import { Shield, ShieldOff, CheckCircle, XCircle } from 'lucide-react';
 import { useModal } from '../context/ModalContext';
 
 export default function AdminUsersPage() {

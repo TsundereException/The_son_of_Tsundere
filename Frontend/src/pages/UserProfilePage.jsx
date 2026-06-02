@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Settings, Package, Heart, ShoppingBag, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import apiClient from '../api/client';
 import { useModal } from '../context/ModalContext';
@@ -18,8 +18,9 @@ export default function UserProfilePage() {
   const [isLoadingListings, setIsLoadingListings] = useState(false);
   const [listingsError, setListingsError] = useState(null);
 
-  const { user, logout, updateProfile } = useAuth();
+  const { user, loading, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Update local state when user loads
   useEffect(() => {
@@ -30,11 +31,15 @@ export default function UserProfilePage() {
 
   const [myOrders, setMyOrders] = useState([]);
   const [mySales, setMySales] = useState([]);
+  const [favoriteProducts, setFavoriteProducts] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [isLoadingSales, setIsLoadingSales] = useState(false);
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(false);
 
   // Fetch listings when tab is 'listings'
   useEffect(() => {
+    if (!user) return;
+
     if (activeTab === 'listings') {
       const fetchListings = async () => {
         setIsLoadingListings(true);
@@ -80,10 +85,25 @@ export default function UserProfilePage() {
         }
       };
       fetchSales();
+    } else if (activeTab === 'favorites') {
+      const fetchFavorites = async () => {
+        setIsLoadingFavorites(true);
+        try {
+          const response = await apiClient.get('/products/favorites/');
+          setFavoriteProducts(response.data.results || response.data);
+        } catch (e) {
+          console.error(e);
+          await showAlert('Не вдалося завантажити улюблене');
+        } finally {
+          setIsLoadingFavorites(false);
+        }
+      };
+      fetchFavorites();
     }
-  }, [activeTab]);
+  }, [activeTab, showAlert, user]);
 
-  if (!user) return <div className="p-8 text-center text-gray-500">Завантаження профілю...</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500">Завантаження профілю...</div>;
+  if (!user) return <Navigate to="/auth" replace state={{ from: location.pathname, isLogin: true }} />;
 
   const initials = user.first_name ? user.first_name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
   const fullName = user.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user.username;
@@ -298,11 +318,21 @@ export default function UserProfilePage() {
         {activeTab === 'favorites' && (
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-6">Улюблене</h1>
-            <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-xl">
-              <Heart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-900">Список порожній</h3>
-              <p className="text-gray-500 mt-1">Додавайте товари в улюблене, щоб не загубити.</p>
-            </div>
+            {isLoadingFavorites ? (
+              <p className="text-gray-500 py-10 text-center">Завантаження...</p>
+            ) : favoriteProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {favoriteProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-xl">
+                <Heart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <h3 className="text-lg font-medium text-gray-900">Список порожній</h3>
+                <p className="text-gray-500 mt-1">Додавайте товари в улюблене, щоб не загубити.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -330,7 +360,7 @@ export default function UserProfilePage() {
                   try {
                     await updateProfile({ city });
                     await showAlert('Профіль оновлено!');
-                  } catch (e) {
+                  } catch {
                     await showAlert('Помилка оновлення');
                   } finally {
                     setIsUpdating(false);
