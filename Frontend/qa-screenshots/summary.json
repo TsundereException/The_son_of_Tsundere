@@ -1,0 +1,160 @@
+[
+  {
+    "page": "home-desktop",
+    "url": "http://127.0.0.1:5174/",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\home-desktop.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Знайти Всі оголошення Увійти Додати Шукай, купуй, продавай швидко! The Son of Tsundere - найкраще місце для вигідних покупок та швидких продажів. Розмістити оголошення Розділи на сервісі Нові оголошення Дивитись усі → Tsundere Знайди те, що шукаєш, або продай непотрібне швидко та безпечно. Email Phone Website НАВІГАЦІЯ Оголошення Мій профіль Про нас ПІДТРИМКА Контакти FAQ / Допомога Правила безпеки ПРАВОВА ІНФОРМАЦІЯ Політика конфіденційності Умови використання © 2026 The Son of Tsunder",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4 :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4 :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED"
+    ]
+  },
+  {
+    "page": "catalog-desktop",
+    "url": "http://127.0.0.1:5174/catalog",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\catalog-desktop.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Знайти Всі оголошення Увійти Додати Каталог товарів Сортувати за: Найновіші Від дешевих до дорогих Від дорогих до дешевих Tsundere Знайди те, що шукаєш, або продай непотрібне швидко та безпечно. Email Phone Website НАВІГАЦІЯ Оголошення Мій профіль Про нас ПІДТРИМКА Контакти FAQ / Допомога Правила безпеки ПРАВОВА ІНФОРМАЦІЯ Політика конфіденційності Умови використання © 2026 The Son of Tsundere. Всі права захищено.",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/filters-config/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/filters-config/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED"
+    ]
+  },
+  {
+    "page": "auth-desktop",
+    "url": "http://127.0.0.1:5174/auth",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\auth-desktop.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Знайти Всі оголошення Увійти Додати З поверненням! Увійдіть, щоб продовжити покупки Вхід Реєстрація Email Пароль Запам'ятати мене Забули пароль? Увійти Або продовжити через Вхід через Google Вхід через GitHub Tsundere Знайди те, що шукаєш, або продай непотрібне швидко та безпечно. Email Phone Website НАВІГАЦІЯ Оголошення Мій профіль Про нас ПІДТРИМКА Контакти FAQ / Допомога Правила безпеки ПРАВОВА ІНФОРМАЦІЯ Політика конфіденційності Умови використання © 2026 The Son of Tsundere. Всі пр",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED"
+    ]
+  },
+  {
+    "page": "add-listing-guest-desktop",
+    "url": "http://127.0.0.1:5174/add-listing",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\add-listing-guest-desktop.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Знайти Всі оголошення Увійти Додати Додати оголошення Фотографії Перше фото буде основним (на обкладинці оголошення). Додати фото Назва товару * Категорія * Оберіть категорію Ціна * Ціна Безкоштовно Обмін Ціна грн Договірна Безпечна угода (Доставка) Дозвольте покупцям безпечно оплачувати товар на сайті. Гроші переказуються вам після огляду товару на пошті. Опис * Ваші контактні дані Місто Не вказано Івано-Франківськ Вінниця Дніпро Донецьк Житомир Запоріжжя Київ Кривий Ріг Луганськ Луцьк",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load categories AxiosError: Network Error\n    at XMLHttpRequest.handleError (http://127.0.0.1:5174/node_modules/.vite/deps/axios.js?v=228d8d56:2120:16)",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load categories AxiosError: Network Error\n    at XMLHttpRequest.handleError (http://127.0.0.1:5174/node_modules/.vite/deps/axios.js?v=228d8d56:2120:16)",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED"
+    ]
+  },
+  {
+    "page": "home-mobile",
+    "url": "http://127.0.0.1:5174/",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\home-mobile.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Увійти Шукай, купуй, продавай швидко! The Son of Tsundere - найкраще місце для вигідних покупок та швидких продажів. Розмістити оголошення Розділи на сервісі Нові оголошення Дивитись усі → Tsundere Знайди те, що шукаєш, або продай непотрібне швидко та безпечно. Email Phone Website НАВІГАЦІЯ Оголошення Мій профіль Про нас ПІДТРИМКА Контакти FAQ / Допомога Правила безпеки ПРАВОВА ІНФОРМАЦІЯ Політика конфіденційності Умови використання © 2026 The Son of Tsundere. Всі права захищено.",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/categories/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4 :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?ordering=-created_at&limit=4 :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/categories/ :: net::ERR_FAILED"
+    ]
+  },
+  {
+    "page": "catalog-mobile",
+    "url": "http://127.0.0.1:5174/catalog",
+    "screenshot": "C:\\Users\\Admin\\Desktop\\Практика\\The_son_of_Tsundere-main\\Frontend\\qa-screenshots\\catalog-mobile.png",
+    "title": "frontend",
+    "bodyStart": "Tsundere Увійти Каталог товарів Сортувати за: Найновіші Від дешевих до дорогих Від дорогих до дешевих Tsundere Знайди те, що шукаєш, або продай непотрібне швидко та безпечно. Email Phone Website НАВІГАЦІЯ Оголошення Мій профіль Про нас ПІДТРИМКА Контакти FAQ / Допомога Правила безпеки ПРАВОВА ІНФОРМАЦІЯ Політика конфіденційності Умови використання © 2026 The Son of Tsundere. Всі права захищено.",
+    "consoleErrors": [
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/filters-config/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/cities/' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED",
+      "error: Access to XMLHttpRequest at 'http://localhost:8000/api/v1/products/?page=1&ordering=-created_at' from origin 'http://127.0.0.1:5174' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "error: Failed to load resource: net::ERR_FAILED"
+    ],
+    "failedRequests": [
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/filters-config/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/cities/ :: net::ERR_FAILED",
+      "GET http://localhost:8000/api/v1/products/?page=1&ordering=-created_at :: net::ERR_FAILED"
+    ]
+  }
+]

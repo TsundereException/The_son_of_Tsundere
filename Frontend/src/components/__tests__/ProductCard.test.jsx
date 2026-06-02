@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { screen } from '../../test-utils';
+import { renderWithProviders } from '../../test-utils';
 import ProductCard from '../ProductCard';
 
 const mockProduct = {
@@ -14,11 +14,7 @@ const mockProduct = {
 
 describe('ProductCard component', () => {
   it('renders product details correctly', () => {
-    render(
-      <BrowserRouter>
-        <ProductCard product={mockProduct} />
-      </BrowserRouter>
-    );
+    renderWithProviders(<ProductCard product={mockProduct} />);
     
     expect(screen.getByText('Test Product Title')).toBeInTheDocument();
     expect(screen.getByText('999 ₴')).toBeInTheDocument();
@@ -27,21 +23,13 @@ describe('ProductCard component', () => {
   });
 
   it('renders New badge if condition is New', () => {
-    render(
-      <BrowserRouter>
-        <ProductCard product={mockProduct} />
-      </BrowserRouter>
-    );
+    renderWithProviders(<ProductCard product={mockProduct} />);
     
     expect(screen.getByText('Нове')).toBeInTheDocument();
   });
 
   it('does not render New badge if condition is Used', () => {
-    render(
-      <BrowserRouter>
-        <ProductCard product={{ ...mockProduct, condition: 'Used' }} />
-      </BrowserRouter>
-    );
+    renderWithProviders(<ProductCard product={{ ...mockProduct, condition: 'Used' }} />);
     
     expect(screen.queryByText('Нове')).not.toBeInTheDocument();
   });

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { X, CreditCard, MapPin, Truck } from 'lucide-react';
-import apiClient from '../api/client';
+import apiClient, { formatApiError } from '../api/client';
 import { useNavigate } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
 
@@ -20,24 +20,45 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
 
   if (!isOpen) return null;
 
-  const handleNext = () => setStep(step + 1);
+  const handleNext = () => {
+    if (!formData.address.trim()) {
+      setError('Вкажіть відділення або адресу доставки');
+      return;
+    }
+    setError('');
+    setStep(step + 1);
+  };
   const handleBack = () => setStep(step - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const address = formData.address.trim();
+    const comment = formData.comment.trim();
+    const cardNumber = formData.card_number.replace(/\D/g, '');
+
+    if (!address) {
+      setError('Вкажіть відділення або адресу доставки');
+      return;
+    }
+    if (isSafeDeal && (cardNumber.length < 12 || cardNumber.length > 19)) {
+      setError('Номер картки має містити від 12 до 19 цифр');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
     try {
       const payload = {
-        address: formData.address,
-        comment: formData.comment,
+        address,
+        comment,
         items: [{ product_id: product.id, quantity: 1 }]
       };
 
       if (isSafeDeal) {
         payload.delivery_provider = formData.delivery_provider;
-        payload.card_number = formData.card_number;
+        payload.card_number = cardNumber;
         await apiClient.post('/orders/safe-buy/', payload);
         await showAlert('Безпечну угоду оформлено успішно! Гроші зарезервовані.');
       } else {
@@ -48,7 +69,7 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
       onClose();
       navigate('/profile'); // Перехід до профілю (Мої замовлення)
     } catch (err) {
-      setError(err.response?.data?.detail || 'Помилка оформлення замовлення');
+      setError(formatApiError(err, 'Помилка оформлення замовлення'));
     } finally {
       setIsSubmitting(false);
     }
@@ -188,7 +209,7 @@ export default function CheckoutModal({ isOpen, onClose, product, isSafeDeal }) 
               Далі (Оплата)
             </button>
           ) : (
-            <button type="submit" form="checkout-form" disabled={isSubmitting || (isSafeDeal && !formData.card_number)} className="px-6 py-2 rounded-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 flex-1">
+            <button type="submit" form="checkout-form" disabled={isSubmitting || !formData.address.trim() || (isSafeDeal && !formData.card_number.trim())} className="px-6 py-2 rounded-lg font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 flex-1">
               {isSubmitting ? 'Обробка...' : (isSafeDeal ? `Оплатити ${product.price} ₴` : 'Замовити')}
             </button>
           )}

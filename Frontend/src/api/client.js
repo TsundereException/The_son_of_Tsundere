@@ -1,12 +1,33 @@
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+
 // Створюємо інстанс axios з базовим URL нашого бекенду
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+export const formatApiError = (error, fallback = 'Сталася помилка') => {
+  const data = error?.response?.data;
+  if (!data) return error?.message || fallback;
+  if (typeof data === 'string') return data;
+  if (data.detail) return data.detail;
+
+  const collect = (value) => {
+    if (Array.isArray(value)) return value.flatMap(collect);
+    if (value && typeof value === 'object') {
+      return Object.entries(value).flatMap(([key, nested]) =>
+        collect(nested).map((message) => `${key}: ${message}`)
+      );
+    }
+    return [String(value)];
+  };
+
+  return collect(data).filter(Boolean).join(' ') || fallback;
+};
 
 // Перехоплювач запитів: додає JWT токен, якщо він є у localStorage
 apiClient.interceptors.request.use(
@@ -34,7 +55,7 @@ apiClient.interceptors.response.use(
       if (refreshToken) {
         try {
           // Робимо запит на оновлення токена
-          const { data } = await axios.post('http://localhost:8000/api/v1/auth/token/refresh/', {
+          const { data } = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
             refresh: refreshToken,
           });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
-import { Eye, Edit2 } from 'lucide-react';
+import { Edit2 } from 'lucide-react';
 import { useModal } from '../context/ModalContext';
 
 export default function AdminOrdersPage() {
@@ -23,11 +23,10 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  const changeStatus = async (id, currentStatus) => {
-    const statuses = ['pending', 'paid', 'payment_held', 'seller_pending', 'shipped', 'delivered', 'returned', 'completed', 'cancelled'];
+  const changeStatus = async (id) => {
+    const statuses = ['pending', 'payment_held', 'seller_pending', 'shipped', 'delivered', 'returned', 'completed', 'cancelled'];
     const statusMap = {
       pending: 'Очікує оплати',
-      paid: 'Оплачено',
       payment_held: 'Кошти зарезервовано',
       seller_pending: 'Очікує відправки',
       shipped: 'Відправлено',
@@ -95,7 +94,7 @@ export default function AdminOrdersPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button 
-                    onClick={() => changeStatus(order.id, order.status)}
+                    onClick={() => changeStatus(order.id)}
                     className="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
                     title="Змінити статус"
                   >

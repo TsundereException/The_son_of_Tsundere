@@ -32,6 +32,19 @@ class AdminCategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'slug', 'parent']
 
+    def validate(self, attrs):
+        parent = attrs.get('parent')
+        instance = self.instance
+        if instance and parent:
+            if parent.pk == instance.pk:
+                raise serializers.ValidationError({'parent': 'Категорія не може бути власним батьком'})
+            current = parent
+            while current:
+                if current.pk == instance.pk:
+                    raise serializers.ValidationError({'parent': 'Категорії не можуть утворювати цикл'})
+                current = current.parent
+        return attrs
+
 class SiteSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSettings
@@ -60,7 +73,7 @@ class AdminStatsAPIView(APIView):
         total_users = User.objects.count()
         active_listings = Product.objects.filter(is_active=True).count()
         
-        successful_orders = Order.objects.filter(status__in=['paid', 'shipped', 'delivered'])
+        successful_orders = Order.objects.filter(status__in=['payment_held', 'seller_pending', 'shipped', 'delivered', 'completed'])
         total_sales = successful_orders.aggregate(Sum('total'))['total__sum'] or 0
         new_visitors = 42 
         
@@ -84,9 +97,11 @@ class AdminStatsAPIView(APIView):
 
         orders_by_status = [
             {"name": "Очікують", "value": Order.objects.filter(status='pending').count()},
-            {"name": "Оплачені", "value": Order.objects.filter(status='paid').count()},
+            {"name": "Кошти зарезервовано", "value": Order.objects.filter(status='payment_held').count()},
+            {"name": "Очікують відправки", "value": Order.objects.filter(status='seller_pending').count()},
             {"name": "Відправлені", "value": Order.objects.filter(status='shipped').count()},
             {"name": "Доставлені", "value": Order.objects.filter(status='delivered').count()},
+            {"name": "Завершені", "value": Order.objects.filter(status='completed').count()},
             {"name": "Скасовані", "value": Order.objects.filter(status='cancelled').count()},
         ]
 

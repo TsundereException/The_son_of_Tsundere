@@ -3,8 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.shortcuts import get_object_or_404
+from django.db import transaction
 
 from django.db.models import Q, Max
 from .models import Category, Product, ProductImage, Review, FilterAttribute
@@ -260,6 +263,7 @@ class SurzhykSearchFilter(SearchFilter):
     def get_search_terms(self, request):
         params = request.query_params.get(self.search_param, '')
         params = params.replace('\x00', '')  # strip null characters
+        params = params[:200]
         params = translate_surzhyk(params)
         return params.replace(',', ' ').split()
 
@@ -314,6 +318,7 @@ class ProductListView(generics.ListAPIView):
     def _filter_by_city(self, queryset, params):
         city = params.get('city')
         if city:
+            city = city.strip()[:50]
             city_translated = translate_surzhyk(city)
             
             q_objects = Q(city__icontains=city)
@@ -333,11 +338,17 @@ class ProductListView(generics.ListAPIView):
     def _filter_by_price_and_photo(self, queryset, params):
         min_price = params.get('min_price')
         if min_price:
-            queryset = queryset.filter(price__gte=min_price)
+            try:
+                queryset = queryset.filter(price__gte=float(min_price))
+            except (TypeError, ValueError):
+                pass
             
         max_price = params.get('max_price')
         if max_price:
-            queryset = queryset.filter(price__lte=max_price)
+            try:
+                queryset = queryset.filter(price__lte=float(max_price))
+            except (TypeError, ValueError):
+                pass
 
         has_photo = params.get('has_photo')
         if has_photo and has_photo.lower() == 'true':
@@ -349,14 +360,21 @@ class ProductListView(generics.ListAPIView):
         for key, value in params.items():
             if key.startswith('attr_') and value:
                 attr_name = key[5:]
+                value = str(value)[:200]
                 if attr_name.endswith('_min'):
                     attr_slug = attr_name[:-4]
+                    if not attr_slug.replace('_', '').replace('-', '').isalnum():
+                        continue
                     queryset = queryset.filter(**{f"attributes__{attr_slug}__gte": value})
                 elif attr_name.endswith('_max'):
                     attr_slug = attr_name[:-4]
+                    if not attr_slug.replace('_', '').replace('-', '').isalnum():
+                        continue
                     queryset = queryset.filter(**{f"attributes__{attr_slug}__lte": value})
                 else:
                     attr_slug = attr_name
+                    if not attr_slug.replace('_', '').replace('-', '').isalnum():
+                        continue
                     values = value.split(',')
                     q_objects = Q()
                     for v in values:
@@ -427,15 +445,19 @@ class ProductImageUploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        product = Product.objects.get(pk=pk, seller=request.user)
+        product = get_object_or_404(Product, pk=pk, seller=request.user)
         
         if product.images.count() >= 10:
-            from rest_framework.exceptions import ValidationError
             raise ValidationError({'detail': 'Максимальна кількість фотографій - 10'})
             
         serializer = ProductImageUploadSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(product=product)
+            with transaction.atomic():
+                if serializer.validated_data.get('is_main'):
+                    product.images.update(is_main=False)
+                elif not product.images.exists():
+                    serializer.validated_data['is_main'] = True
+                serializer.save(product=product)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

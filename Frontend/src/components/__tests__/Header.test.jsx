@@ -1,32 +1,20 @@
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { screen } from '../../test-utils';
+import { renderWithProviders } from '../../test-utils';
 import Header from '../Header';
 
 describe('Header component', () => {
   it('renders logo', () => {
-    render(
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
-    );
+    renderWithProviders(<Header />);
     expect(screen.getByText('Tsundere')).toBeInTheDocument();
   });
 
   it('renders search input', () => {
-    render(
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
-    );
-    expect(screen.getByPlaceholderText('Я шукаю...')).toBeInTheDocument();
+    renderWithProviders(<Header />);
+    expect(screen.getByPlaceholderText('Що шукаєте?')).toBeInTheDocument();
   });
 
   it('renders Add Listing button', () => {
-    render(
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
-    );
-    expect(screen.getByText('Додати оголошення')).toBeInTheDocument();
+    renderWithProviders(<Header />);
+    expect(screen.getByText('Додати')).toBeInTheDocument();
   });
 });

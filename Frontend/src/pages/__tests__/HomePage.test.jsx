@@ -1,40 +1,27 @@
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { screen } from '../../test-utils';
+import { renderWithProviders } from '../../test-utils';
 import HomePage from '../HomePage';
 
 describe('HomePage component', () => {
   it('renders hero section correctly', () => {
-    render(
-      <BrowserRouter>
-        <HomePage />
-      </BrowserRouter>
-    );
+    renderWithProviders(<HomePage />);
     
     expect(screen.getByText('Шукай, купуй, продавай швидко!')).toBeInTheDocument();
     expect(screen.getByText('Розмістити оголошення')).toBeInTheDocument();
   });
 
-  it('renders categories', () => {
-    render(
-      <BrowserRouter>
-        <HomePage />
-      </BrowserRouter>
-    );
+  it('renders categories', async () => {
+    renderWithProviders(<HomePage />);
     
-    expect(screen.getByText('Популярні категорії')).toBeInTheDocument();
-    expect(screen.getByText('Смартфони')).toBeInTheDocument();
-    expect(screen.getByText('Ноутбуки')).toBeInTheDocument();
+    expect(screen.getByText('Розділи на сервісі')).toBeInTheDocument();
+    expect(await screen.findByText('Смартфони')).toBeInTheDocument();
+    expect(await screen.findByText('Ноутбуки')).toBeInTheDocument();
   });
 
-  it('renders recent listings section', () => {
-    render(
-      <BrowserRouter>
-        <HomePage />
-      </BrowserRouter>
-    );
+  it('renders recent listings section', async () => {
+    renderWithProviders(<HomePage />);
     
     expect(screen.getByText('Нові оголошення')).toBeInTheDocument();
-    // Assuming MOCK_PRODUCTS has MacBook
-    expect(screen.getByText(/MacBook/i)).toBeInTheDocument();
+    expect(await screen.findByText(/MacBook/i)).toBeInTheDocument();
   });
 });

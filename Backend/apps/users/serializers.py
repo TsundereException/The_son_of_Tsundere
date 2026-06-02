@@ -4,6 +4,9 @@ from django.contrib.auth.password_validation import validate_password
 from .models import User
 
 
+SELF_REGISTER_ROLES = {'buyer', 'seller'}
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Публічний профіль користувача"""
     class Meta:
@@ -11,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name',
                   'role', 'phone', 'city', 'avatar', 'bio', 'created_at',
                   'is_staff', 'is_superuser']
-        read_only_fields = ['id', 'created_at', 'is_staff', 'is_superuser']
+        read_only_fields = ['id', 'email', 'username', 'role', 'created_at', 'is_staff', 'is_superuser']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -24,9 +27,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'password2',
                   'first_name', 'last_name', 'role', 'phone']
 
+    def validate_email(self, value):
+        value = value.strip().lower()
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError('Користувач з таким email вже існує')
+        return value
+
+    def validate_role(self, value):
+        if value not in SELF_REGISTER_ROLES:
+            raise serializers.ValidationError('Некоректна роль для реєстрації')
+        return value
+
     def validate(self, data):
         if data['password'] != data['password2']:
             raise serializers.ValidationError({'password': 'Паролі не співпадають'})
+        data['username'] = data['username'].strip()
         return data
 
     def create(self, validated_data):
@@ -47,7 +62,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             del self.fields['username']
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        email = attrs.get('email', '').strip().lower()
         password = attrs.get('password')
 
         if email and password:

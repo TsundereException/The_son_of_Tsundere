@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext';
 import apiClient from '../api/client';
@@ -9,7 +9,7 @@ export const FavoritesProvider = ({ children }) => {
   const { user } = useAuth();
   const [favoritesCount, setFavoritesCount] = useState(0);
 
-  const fetchFavoritesCount = async () => {
+  const fetchFavoritesCount = useCallback(async () => {
     if (!user) {
       setFavoritesCount(0);
       return;
@@ -20,11 +20,11 @@ export const FavoritesProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to fetch favorites count:', error);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchFavoritesCount();
-  }, [user]);
+  }, [fetchFavoritesCount]);
 
   const updateFavoritesCount = (change) => {
     setFavoritesCount(prev => Math.max(0, prev + change));
@@ -34,7 +34,7 @@ export const FavoritesProvider = ({ children }) => {
     favoritesCount,
     updateFavoritesCount,
     fetchFavoritesCount
-  }), [favoritesCount]);
+  }), [favoritesCount, fetchFavoritesCount]);
 
   return (
     <FavoritesContext.Provider value={contextValue}>

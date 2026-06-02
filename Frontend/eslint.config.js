@@ -19,6 +19,7 @@ export default defineConfig([globalIgnores(['dist']), {
     parserOptions: { ecmaFeatures: { jsx: true } },
   },
   rules: {
-    'react-hooks/set-state-in-effect': 'off'
+    'react-hooks/set-state-in-effect': 'off',
+    'react-refresh/only-export-components': 'off'
   }
 }, ...storybook.configs["flat/recommended"]])

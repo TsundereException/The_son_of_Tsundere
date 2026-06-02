@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.db.models import Prefetch
 
 from .models import Conversation, Message
 from .serializers import (
@@ -38,7 +37,14 @@ class StartConversationView(APIView):
             return Response({'error': 'seller_id обовʼязковий'}, status=status.HTTP_400_BAD_REQUEST)
 
         seller = get_object_or_404(User, pk=seller_id)
-        product = Product.objects.filter(pk=product_id).first() if product_id else None
+        if seller == request.user:
+            return Response({'error': 'Не можна створити діалог із самим собою'}, status=status.HTTP_400_BAD_REQUEST)
+
+        product = None
+        if product_id:
+            product = get_object_or_404(Product, pk=product_id, is_active=True)
+            if product.seller_id != seller.id:
+                return Response({'error': 'Товар не належить обраному продавцю'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if conversation already exists
         conv = Conversation.objects.filter(participants=request.user).filter(participants=seller)
@@ -52,10 +58,12 @@ class StartConversationView(APIView):
             conversation.participants.add(request.user, seller)
 
         if initial_message:
+            serializer = SendMessageSerializer(data={'text': initial_message})
+            serializer.is_valid(raise_exception=True)
             Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
-                text=initial_message
+                text=serializer.validated_data['text']
             )
             conversation.save() # update updated_at
 

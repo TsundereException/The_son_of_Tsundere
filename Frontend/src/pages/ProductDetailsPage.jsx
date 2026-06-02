@@ -87,6 +87,10 @@ export default function ProductDetailsPage() {
       navigate('/auth');
       return;
     }
+    if (product.seller?.id === user.id) {
+      await showAlert('Ви не можете купити власний товар');
+      return;
+    }
     setCheckoutMode(isSafe);
     setIsCheckoutOpen(true);
   };

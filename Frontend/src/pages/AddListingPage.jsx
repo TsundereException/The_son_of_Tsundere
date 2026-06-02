@@ -1,12 +1,27 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import apiClient from '../api/client';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import apiClient, { formatApiError } from '../api/client';
 import ListingForm from '../components/ListingForm';
+import { useAuth } from '../context/AuthContext';
 
 export default function AddListingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace state={{ from: location.pathname, isLogin: true }} />;
+  }
 
   const handleSubmit = async ({ formData, priceType, isNegotiable, images }) => {
     if (!formData.name || !formData.category_id || !formData.description) {
@@ -70,7 +85,7 @@ export default function AddListingPage() {
       
     } catch (err) {
       console.error('Submit error:', err);
-      setError(err.response?.data?.detail || 'Помилка при створенні оголошення. Спробуйте ще раз.');
+      setError(formatApiError(err, 'Помилка при створенні оголошення. Спробуйте ще раз.'));
     } finally {
       setIsSubmitting(false);
     }

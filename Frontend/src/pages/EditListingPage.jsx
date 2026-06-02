@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../api/client';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import apiClient, { formatApiError } from '../api/client';
 import ListingForm from '../components/ListingForm';
+import { useAuth } from '../context/AuthContext';
 
 export default function EditListingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { slug } = useParams();
+  const { user, loading: authLoading } = useAuth();
   
   const [initialData, setInitialData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,8 +47,8 @@ export default function EditListingPage() {
         setIsLoading(false);
       }
     };
-    if (slug) fetchProduct();
-  }, [slug]);
+    if (user && slug) fetchProduct();
+  }, [slug, user]);
 
   const handleSubmit = async ({ formData, priceType, isNegotiable, images, imagesToDelete }) => {
     if (!formData.name || !formData.category_id || !formData.description) {
@@ -116,11 +119,23 @@ export default function EditListingPage() {
       
     } catch (err) {
       console.error('Submit error:', err);
-      setError(err.response?.data?.detail || 'Помилка при збереженні оголошення. Спробуйте ще раз.');
+      setError(formatApiError(err, 'Помилка при збереженні оголошення. Спробуйте ще раз.'));
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace state={{ from: location.pathname, isLogin: true }} />;
+  }
 
   if (isLoading) {
     return (
